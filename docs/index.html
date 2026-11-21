@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MangoDisk — limpeza e análise de disco</title>
+  <meta name="description" content="MangoDisk: limpeza segura de disco, análise de armazenamento e privacidade para macOS, Windows e Linux." />
+  <style>
+    :root { --bg:#fffaf1; --fg:#3a2b23; --accent:#d15b00; --card:#ffffffcc; --border:#c5570c1f; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#211c18; --fg:#f3e9df; --card:#302822cc; --border:#ff97310f; --accent:#ff8a00; } }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif }
+    header { padding:56px 20px 28px; text-align:center }
+    header img { width:64px; height:64px }
+    h1 { margin:12px 0 4px; font-size:40px; letter-spacing:-.02em }
+    .sub { opacity:.75; margin:0 auto 20px; max-width:700px }
+    .pix { display:inline-block; padding:8px 18px; border:1px solid var(--accent); border-radius:999px; color:var(--accent); font-weight:700 }
+    nav a { margin:0 8px; color:var(--accent); text-decoration:none; font-weight:600 }
+    main { max-width:1080px; margin:0 auto; padding:24px 20px 80px }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin:28px 0 }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:20px; box-shadow:0 12px 32px #0000000a }
+    .card h3 { margin:0 0 8px; font-size:18px }
+    .card p { margin:0; opacity:.82; font-size:14px }
+    h2 { margin-top:48px; font-size:26px }
+    .shots { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px }
+    .shots figure { margin:0; background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden }
+    .shots img { display:block; width:100%; height:auto }
+    .shots figcaption { padding:10px 14px; font-size:14px; opacity:.75 }
+    footer { text-align:center; padding:30px 20px 60px; opacity:.7; font-size:14px }
+    code { background:#0000000d; padding:2px 6px; border-radius:6px }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="mangodisk.svg" alt="Ícone do MangoDisk" />
+    <h1>MangoDisk</h1>
+    <p class="sub">Limpeza de disco, análise de armazenamento e proteção de privacidade para <b>macOS</b>, <b>Windows</b> e <b>Linux</b>.</p>
+    <span class="pix">Pix: pixgg</span>
+    <p><nav>
+      <a href="https://github.com/RamonMods/MangoDisk">Repositório</a>
+      <a href="https://github.com/RamonMods/MangoDisk/releases/latest">Baixar</a>
+      <a href="https://github.com/RamonMods/MangoDisk/blob/main/README.md">Documentação</a>
+    </nav></p>
+  </header>
+  <main>
+    <section class="grid">
+      <div class="card"><h3>Limpeza profunda</h3><p>Caches, logs, artefatos de build, modelos de IA e arquivos temporários em um só lugar.</p></div>
+      <div class="card"><h3>Arquivos grandes e duplicados</h3><p>Encontre o que ocupa espaço e remova duplicatas com seleção segura.</p></div>
+      <div class="card"><h3>Privacidade</h3><p>Limpe históricos, cookies e rastros deixados por navegadores e aplicativos.</p></div>
+      <div class="card"><h3>Segurança primeiro</h3><p>Varredura somente leitura, prévia, confirmação explícita e histórico de operações.</p></div>
+    </section>
+    <h2>Capturas de tela</h2>
+    <section class="shots">
+      <figure><img src="screenshots/light-00-overview.jpg" alt="Visão geral" /><figcaption>Visão geral</figcaption></figure>
+      <figure><img src="screenshots/light-01-deep-cleanup.jpg" alt="Limpeza profunda" /><figcaption>Limpeza profunda</figcaption></figure>
+      <figure><img src="screenshots/light-02-large-file-cleanup.jpg" alt="Arquivos grandes" /><figcaption>Arquivos grandes</figcaption></figure>
+      <figure><img src="screenshots/light-03-duplicate-cleanup.jpg" alt="Arquivos duplicados" /><figcaption>Arquivos duplicados</figcaption></figure>
+    </section>
+    <h2>Instalação rápida</h2>
+    <div class="card">
+      <p>Windows: <code>winget install --id MangoDisk.MangoDisk --exact --source winget</code></p>
+      <p>macOS: <code>brew install --cask RamonMods/tap/mangodisk</code> — use o instalador da página de releases.</p>
+      <p>Código-fonte e demais plataformas: <a href="https://github.com/RamonMods/MangoDisk">github.com/RamonMods/MangoDisk</a>.</p>
+    </div>
+  </main>
+  <footer>MangoDisk · mantido por RamonMods · licença GPL-3.0</footer>
+</body>
+</html>
