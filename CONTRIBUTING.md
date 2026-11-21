@@ -1,86 +1,99 @@
-# Contributing to MangoDisk
+# Contribuindo para o MangoDisk
 
-Thank you for contributing to MangoDisk. This guide defines the contribution
-workflow; repository instructions remain authoritative for implementation
-details.
+Obrigado por contribuir para o MangoDisk. Este guia define o fluxo de trabalho de
+contribuição; as instruções do repositório continuam sendo a referência
+autoritativa para os detalhes de implementação.
 
-## Before making a change
+## Antes de fazer uma alteração
 
-1. Read [`AGENTS.md`](AGENTS.md) and the nearest subtree instructions.
-2. Keep Core, Platform, Tauri, CLI, and Vue responsibilities separate.
-3. Prefer validated TOML when extending ordinary cleanup coverage.
-4. Explain ownership, failure behavior, and tests before introducing a
-   capability that crosses three or more domains.
+1. Leia [`AGENTS.md`](AGENTS.md) e as instruções da subárvore mais próxima.
+2. Mantenha as responsabilidades de Core, Platform, Tauri, CLI e Vue separadas.
+3. Prefira TOML validado ao estender a cobertura comum de limpeza.
+4. Explique a responsabilidade, o comportamento em caso de falha e os testes
+   antes de introduzir uma capacidade que atravesse três ou mais domínios.
 
-## Development requirements
+## Requisitos de desenvolvimento
 
-- Use Node.js 24 and the pnpm version declared in `package.json`.
-- Use the Rust toolchain declared by the repository.
-- Windows Explorer packaging honors `WindowsSdkDir` from the developer shell.
-  Set it to the installed SDK root when the SDK uses a custom location; otherwise
-  the build uses the standard Windows Kits directory.
-- Keep user-facing text synchronized across every supported locale resource.
-- Use generic deterministic paths in tests.
-- Never commit credentials, personal paths, private file names, raw scan
-  results, build outputs, or local dependency directories.
-- Preserve dry-run, protected-path, preflight, confirmation, and verification
-  boundaries for every destructive flow.
+- Use o Node.js 24 e a versão do pnpm declarada em `package.json`.
+- Use a toolchain do Rust declarada pelo repositório.
+- O empacotamento do Windows Explorer respeita `WindowsSdkDir` do shell do
+  desenvolvedor. Defina-o para a raiz do SDK instalado quando o SDK usar um local
+  personalizado; caso contrário, a compilação usa o diretório padrão do Windows
+  Kits.
+- Mantenha os textos voltados ao usuário sincronizados em todos os recursos de
+  idioma suportados.
+- Use caminhos genéricos e determinísticos nos testes.
+- Nunca faça commit de credenciais, caminhos pessoais, nomes de arquivos
+  privados, resultados brutos de varredura, saídas de compilação ou diretórios
+  locais de dependências.
+- Preserve os limites de simulação (dry-run), caminhos protegidos,
+  pré-verificação (preflight), confirmação e verificação para todo fluxo
+  destrutivo.
 
-## Validation
+## Validação
 
-Run the full local validation before submitting a change:
+Execute a validação local completa antes de enviar uma alteração:
 
 ```sh
 pnpm check
 cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core
 ```
 
-Cross-platform changes require the applicable checks on macOS and Windows. If a
-platform is unavailable, identify that unvalidated scope in the pull request.
-Performance changes should describe a reproducible workload and before-and-after
-result without committing raw machine reports or private datasets.
+Alterações multiplataforma exigem as verificações aplicáveis no macOS e no
+Windows. Se uma plataforma não estiver disponível, identifique esse escopo não
+validado no pull request. Alterações de desempenho devem descrever uma carga de
+trabalho reproduzível e o resultado antes e depois, sem fazer commit de
+relatórios brutos de máquina ou conjuntos de dados privados.
 
-Run filesystem permission tests from a normal Windows desktop terminal. SSH sessions
-with enabled backup/restore privileges can bypass fixture ACLs and invalidate their
-permission-denial assertions; do not suppress those failures.
+Execute os testes de permissão do sistema de arquivos a partir de um terminal
+normal da área de trabalho do Windows. Sessões SSH com privilégios de
+backup/restauração habilitados podem ignorar as ACLs dos fixtures e invalidar
+suas asserções de negação de permissão; não suprima essas falhas.
 
-For native privacy execution validation on a disposable Windows machine, run:
+Para a validação de execução nativa de privacidade em uma máquina Windows
+descartável, execute:
 
 ```powershell
 $env:MANGODISK_PRIVACY_VALIDATION_DIR = Join-Path $PWD 'validation/privacy'
 cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core --test windows_privacy_execution_validation native_privacy_execution_matrix -- --ignored --nocapture
 ```
 
-This opt-in test creates unique browser profiles under the current account's native
-profile directories and selects only its generated sources. It covers exclusions,
-process state, locks, junctions, drift, cancellation, history failures, platform
-isolation, and diagnostic content boundaries. Generated profiles are removed afterward; evidence stays in the
-chosen directory and must not be committed.
+Este teste opcional (opt-in) cria perfis de navegador exclusivos nos diretórios
+nativos de perfil da conta atual e seleciona apenas as fontes por ele geradas.
+Ele cobre exclusões, estado de processos, bloqueios, junctions, desvio (drift),
+cancelamento, falhas de histórico, isolamento de plataforma e limites de
+conteúdo de diagnóstico. Os perfis gerados são removidos em seguida; as
+evidências permanecem no diretório escolhido e não devem ser enviadas em commit.
 
-Windows service switches change automatic startup, not the current running state.
-Only eligible third-party services are writable; protected or uncertain entries
-remain read-only. Disabling preserves the delayed-start setting in the
-administrator-owned `MangoDiskStartupRestoreV1` service registry value. Unknown
-or malformed backup versions fail before mutation; successful re-enabling removes
-the backup. Startup helper protocol v4 rejects older requests before execution.
-For service-control changes, run the ignored `windows::startup::service_control`
-tests in a disposable elevated Windows VM. The existing-service test requires an
-explicit `MANGODISK_TEST_SERVICE_NAMES` allowlist (semicolon-separated); choose
-noncritical third-party services and verify that configuration and runtime state
-are restored afterward.
+As opções de serviço do Windows alteram a inicialização automática, não o estado
+de execução atual. Somente serviços de terceiros elegíveis são graváveis;
+entradas protegidas ou incertas permanecem somente leitura. A desativação
+preserva a configuração de inicialização atrasada no valor de registro de
+serviço `MangoDiskStartupRestoreV1`, de propriedade do administrador. Versões de
+backup desconhecidas ou malformadas falham antes da mutação; a reativação
+bem-sucedida remove o backup. O protocolo v4 do auxiliar de inicialização
+rejeita solicitações antigas antes da execução. Para alterações de controle de
+serviço, execute os testes ignorados `windows::startup::service_control` em uma
+VM Windows elevada e descartável. O teste de serviço existente requer uma lista
+de permissões explícita `MANGODISK_TEST_SERVICE_NAMES` (separada por ponto e
+vírgula); escolha serviços de terceiros não críticos e verifique se a
+configuração e o estado de execução são restaurados em seguida.
 
-On macOS, validate that closing hides the window, Dock reopening restores it,
-and Quit exits immediately, including during a scan, using the bundled app.
+No macOS, valide que fechar oculta a janela, reabrir pelo Dock a restaura, e
+Sair encerra imediatamente, inclusive durante uma varredura, usando o aplicativo
+empacotado.
 
 ## Pull requests
 
-- Keep each pull request focused on one coherent purpose.
-- Explain observable behavior, safety impact, and validation evidence.
-- Add tests for safety boundaries, protocol changes, persistence, and
-  regressions.
-- Update contributor-facing README guidance in the same change as its behavior.
-- Do not hide failures with allow attributes, global machine settings, or
-  undocumented fallbacks.
+- Mantenha cada pull request focado em um propósito coerente.
+- Explique o comportamento observável, o impacto na segurança e as evidências de
+  validação.
+- Adicione testes para limites de segurança, alterações de protocolo,
+  persistência e regressões.
+- Atualize as orientações do README voltadas a colaboradores na mesma alteração
+  que modifica seu comportamento.
+- Não oculte falhas com atributos allow, configurações globais da máquina ou
+  fallbacks não documentados.
 
-Security vulnerabilities must follow [`SECURITY.md`](SECURITY.md) rather than a
-public issue.
+Vulnerabilidades de segurança devem seguir [`SECURITY.md`](SECURITY.md), em vez
+de uma issue pública.

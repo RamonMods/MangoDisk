@@ -1,71 +1,71 @@
-# Frontend Guidelines
+# Diretrizes de Frontend
 
-This file applies only to `src/` and inherits the repository-wide rules in [`../AGENTS.md`](../AGENTS.md).
+Este arquivo se aplica apenas a `src/` e herda as regras gerais do repositório em [`../AGENTS.md`](../AGENTS.md).
 
-## Boundaries and layout
+## Limites e layout
 
-- `pages/<domain>/` contains route-level views and components used only by that page.
-- `layouts/` contains the application shell and cross-page layout components; layouts are not pages.
-- `components/custom/` contains project-owned reusable UI primitives.
-- `components/icons/` contains project-owned icon components.
-- `components/ui/` is generated Shadcn-Vue code. Do not edit it for project-wide behavior; configure it or wrap it in `components/custom/`.
-- `stores/` owns UI and workflow state for one domain. A Store may coordinate services but must not copy another Store's complete state.
-- `lib/services/` owns side effects: Tauri invocation, persistence, platform integration, browser APIs, dialogs, and event subscriptions.
-- `lib/utils/` owns deterministic functions only. Utilities must not read Stores, invoke Tauri, access storage, or mutate external state.
-- `lib/models/` contains frontend-owned protocols and constants split by concrete domain. Business code imports the owning file directly; narrow generated-component adapters are not public APIs.
+- `pages/<domain>/` contém visualizações de rota e componentes usados apenas por aquela página.
+- `layouts/` contém o shell da aplicação e componentes de layout compartilhados entre páginas; layouts não são páginas.
+- `components/custom/` contém primitivas de UI reutilizáveis de propriedade do projeto.
+- `components/icons/` contém componentes de ícone de propriedade do projeto.
+- `components/ui/` é código Shadcn-Vue gerado. Não o edite para comportamento de todo o projeto; configure-o ou encapsule-o em `components/custom/`.
+- `stores/` possui o estado de UI e de fluxo de trabalho de um domínio. Um Store pode coordenar serviços, mas não deve copiar o estado completo de outro Store.
+- `lib/services/` possui efeitos colaterais: invocações Tauri, persistência, integração com a plataforma, APIs de navegador, diálogos e assinaturas de eventos.
+- `lib/utils/` possui apenas funções determinísticas. Utilitários não devem ler Stores, invocar Tauri, acessar armazenamento nem mutar estado externo.
+- `lib/models/` contém protocolos e constantes de propriedade do frontend, divididos por domínio concreto. Código de negócio importa o arquivo proprietário diretamente; adaptadores estreitos gerados para componentes não são APIs públicas.
 
-Models, services, and utilities use matching domain subdirectories such as `cleanup/`, `storage/`, `applications/`, and `system-resources/`. Keep tests beside the module they exercise. Put domain-specific calculations in the owning utility directory; reuse domain-independent collection operations from `lib/utils/collections/` and display calculations from `lib/utils/presentation/`. A utility must not discover the platform, read the clock, or own a workflow; pass those facts as inputs from its adapter.
+Modelos, serviços e utilitários usam subdiretórios de domínio correspondentes, como `cleanup/`, `storage/`, `applications/` e `system-resources/`. Mantenha os testes ao lado do módulo que eles exercitam. Coloque cálculos específicos de domínio no diretório de utilitários proprietário; reutilize operações de coleção independentes de domínio de `lib/utils/collections/` e cálculos de exibição de `lib/utils/presentation/`. Um utilitário não deve descobrir a plataforma, ler o relógio nem possuir um fluxo de trabalho; passe esses fatos como entradas a partir de seu adaptador.
 
-Pages may present several domains together, but shared product orchestration must remain explicit; do not create a frontend `manager` or a global Store containing every workflow.
+Páginas podem apresentar vários domínios juntos, mas a orquestração compartilhada de produto deve permanecer explícita; não crie um `manager` de frontend nem um Store global contendo todos os fluxos de trabalho.
 
-## Vue and TypeScript
+## Vue e TypeScript
 
-- Use Vue 3 `<script setup lang="ts">` and strict TypeScript. Do not introduce `any`.
-- Project-owned Vue files use `kebab-case`; reusable custom components and icon files use the `md-` prefix so their ownership is recognizable as MangoDisk code.
-- Prefer props and emits for component communication. Do not use provide/inject as a hidden event bus.
-- Pinia stores use the Options API (`state`, `getters`, `actions`).
-- Prefer exported module functions or static service methods for stateless adapters. Use an owned service instance when it has lifecycle state, replaceable dependencies, or requires test isolation.
-- Avoid new composables and generic `use*` helpers when a named Store, static service, or pure utility gives clearer IDE navigation.
-- Import business code from its concrete file. The minimal indexes required by generated Shadcn code are not public project APIs.
-- Do not duplicate Rust protocol types by guessing. When protocol bindings are maintained manually, update Rust, TypeScript, services, Stores, and compatibility tests in one change.
+- Use Vue 3 `<script setup lang="ts">` e TypeScript estrito. Não introduza `any`.
+- Arquivos Vue de propriedade do projeto usam `kebab-case`; componentes customizados reutilizáveis e arquivos de ícone usam o prefixo `md-` para que sua propriedade seja reconhecível como código MangoDisk.
+- Prefira props e emits para comunicação entre componentes. Não use provide/inject como barramento de eventos oculto.
+- Stores Pinia usam a Options API (`state`, `getters`, `actions`).
+- Prefira funções de módulo exportadas ou métodos estáticos de serviço para adaptadores sem estado. Use uma instância de serviço própria quando ela tiver estado de ciclo de vida, dependências substituíveis ou exigir isolamento de testes.
+- Evite novos composables e helpers genéricos `use*` quando um Store nomeado, um serviço estático ou um utilitário puro oferecer navegação mais clara na IDE.
+- Importe código de negócio de seu arquivo concreto. Os índices mínimos exigidos pelo código Shadcn gerado não são APIs públicas do projeto.
+- Não duplique tipos de protocolo Rust adivinhando. Quando os bindings de protocolo são mantidos manualmente, atualize Rust, TypeScript, serviços, Stores e testes de compatibilidade em uma única alteração.
 
-## Text, status, and logging
+## Texto, status e logs
 
-- All user-facing strings belong in locale resources. Update every supported locale in the same change.
-- Register new locales in `lib/models/settings/settings.ts`, `i18n.ts`, `locales/modules/`, the build and locale checks, and `../src-tauri/src/services/native_labels.rs`. Keep interpolation arguments and safety meanings aligned with the current English resources; use natural local phrasing.
-- Every catalog cleanup rule needs a non-empty name, description, and impact in each supported locale; `pnpm check:i18n` verifies coverage.
-- Locale object keys must be unique. The same check reports both source locations before JSON parsing can discard a duplicate.
-- Constants are domain-owned. Do not move every unrelated constant into a new global constants file.
-- Render behavior from typed status, risk, capability, and reason codes. Free-form backend messages are diagnostics, not UI control flow.
-- Use the project logger service for meaningful lifecycle, failure, and recovery events. Do not use raw `console.*` in production paths.
-- Frontend logs must retain useful error context, object names/paths, operation IDs, and outcomes through `LoggerService`. Exclude credentials, tokens, document contents, and unrelated metadata. Escape and bound serialized context; keep user-facing error handling based on typed codes.
-- Do not localize rule resources. Resolve stable rule IDs and diagnostic codes at the presentation boundary.
+- Todas as strings voltadas ao usuário pertencem aos recursos de locale. Atualize todos os locales suportados na mesma alteração.
+- Registre novos locales em `lib/models/settings/settings.ts`, `i18n.ts`, `locales/modules/`, nas verificações de build e de locale e em `../src-tauri/src/services/native_labels.rs`. Mantenha os argumentos de interpolação e os significados de segurança alinhados com os recursos atuais em inglês; use formulações naturais no idioma local.
+- Cada regra de limpeza de catálogo precisa de um nome, uma descrição e um impacto não vazios em cada locale suportado; `pnpm check:i18n` verifica a cobertura.
+- As chaves de objeto de locale devem ser únicas. A mesma verificação reporta ambas as localizações de origem antes que a análise do JSON possa descartar uma duplicata.
+- Constantes são de propriedade do domínio. Não mova toda constante não relacionada para um novo arquivo global de constantes.
+- Renderize comportamento a partir de códigos tipados de status, risco, capacidade e razão. Mensagens de backend em formato livre são diagnósticos, não fluxo de controle de UI.
+- Use o serviço de logger do projeto para eventos significativos de ciclo de vida, falha e recuperação. Não use `console.*` bruto em caminhos de produção.
+- Os logs de frontend devem reter contexto útil de erro, nomes/caminhos de objetos, IDs de operação e resultados por meio de `LoggerService`. Exclua credenciais, tokens, conteúdos de documentos e metadados não relacionados. Escape e limite o contexto serializado; mantenha o tratamento de erro voltado ao usuário baseado em códigos tipados.
+- Não localize recursos de regra. Resolva IDs de regra estáveis e códigos de diagnóstico no limite de apresentação.
 
-## Styling and interaction
+## Estilização e interação
 
-- `assets/themes/base-tokens.css` owns shared brand identity, typography, native icon colors, and semantic derivations. It must not define a selectable surface palette.
-- `assets/themes/mango.css` and `assets/themes/warm-gray.css` own independent light and dark palettes. Theme selectors must be mutually exclusive and match only their own ID; neither theme may require the other stylesheet to render correctly. Mango also handles the initial state before preferences load; persisted invalid preferences are normalized to Mango.
-- `assets/main.css` imports the shared tokens and both palettes, maps tokens to Tailwind, and owns global layout and interaction styles. Components consume semantic tokens instead of inspecting theme IDs.
-- Use `text-primary-text` and `text-destructive-text` for standalone labels and icons; `primary` and `destructive` are filled-control colors paired with their `*-foreground` tokens. The style-system check enforces this distinction.
-- Tailwind's `dark:` variant must follow the application `data-theme` attribute so manual brightness settings remain independent of the OS preference.
-- The project uses Tailwind CSS 4.3. Verify syntax against v4 documentation.
-- Prefer responsive utilities and named container queries over page-specific viewport media queries. `shell:` is reserved for application-shell navigation.
-- Reusable components fill or shrink within their parent. Exact sizes are appropriate for stable control heights, icon boxes, hit targets, and intrinsic-ratio assets—not page layout widths.
-- Put cross-page scrollbar behavior in `assets/main.css`; use `scrollbar-hidden` or `scrollbar-stable` in components.
-- In scoped CSS, add `@reference "@assets/main.css"` before `@apply`.
-- Buttons and hover states must not translate, scale, or change layout dimensions. Use color, border, or shadow feedback that cannot cause page movement.
-- Keep page headers and content-height behavior consistent through project-owned shell components.
-- Use `MdSettingsGroup` and `MdSettingsRow` for settings-page groups and rows. These components own spacing, alignment, typography, responsive controls, and hover/focus feedback; callers own business state and actions.
-- Use Shadcn-Vue Tooltip (or `MdTooltip`) for hints; do not use native HTML `title` attributes. Component title props for visible headings are unrelated.
-- Modal windows use `Dialog`, `MdDialogContent`, `MdDialogHeader`, and `MdDialogFooter`; active operations use `MdOperationDialog`. Keep dismissal separate from cancellation, and retain confirmation for destructive cancellation. Page-local progress workspaces and non-modal floating panels retain their own interaction contracts.
-- Never place raw SVG markup in a template. Add or reuse a component under `components/icons/`.
+- `assets/themes/base-tokens.css` possui identidade de marca compartilhada, tipografia, cores de ícone nativas e derivações semânticas. Ele não deve definir uma paleta de superfície selecionável.
+- `assets/themes/mango.css` e `assets/themes/warm-gray.css` possuem paletas claras e escuras independentes. Seletores de tema devem ser mutuamente exclusivos e corresponder apenas ao seu próprio ID; nenhum tema pode exigir a folha de estilo do outro para renderizar corretamente. O Mango também lida com o estado inicial antes do carregamento das preferências; preferências inválidas persistidas são normalizadas para o Mango.
+- `assets/main.css` importa os tokens compartilhados e ambas as paletas, mapeia tokens para o Tailwind e possui estilos globais de layout e interação. Componentes consomem tokens semânticos em vez de inspecionar IDs de tema.
+- Use `text-primary-text` e `text-destructive-text` para rótulos e ícones independentes; `primary` e `destructive` são cores de controle preenchido combinadas com seus tokens `*-foreground`. A verificação do sistema de estilos reforça essa distinção.
+- A variante `dark:` do Tailwind deve seguir o atributo `data-theme` da aplicação para que ajustes manuais de brilho permaneçam independentes da preferência do sistema operacional.
+- O projeto usa Tailwind CSS 4.3. Verifique a sintaxe com a documentação da v4.
+- Prefira utilitários responsivos e consultas de contêiner nomeadas em vez de consultas de mídia por viewport específicas de página. `shell:` é reservado para a navegação do shell da aplicação.
+- Componentes reutilizáveis preenchem ou encolhem dentro de seu pai. Tamanhos exatos são apropriados para alturas estáveis de controles, caixas de ícone, alvos de toque e ativos com proporção intrínseca — não para larguras de layout de página.
+- Coloque o comportamento de barra de rolagem compartilhado entre páginas em `assets/main.css`; use `scrollbar-hidden` ou `scrollbar-stable` nos componentes.
+- Em CSS com escopo, adicione `@reference "@assets/main.css"` antes de `@apply`.
+- Botões e estados de hover não devem transladar, escalar nem alterar dimensões de layout. Use feedback de cor, borda ou sombra que não possa causar movimento da página.
+- Mantenha cabeçalhos de página e o comportamento de altura de conteúdo consistentes por meio de componentes de shell de propriedade do projeto.
+- Use `MdSettingsGroup` e `MdSettingsRow` para grupos e linhas de páginas de configurações. Esses componentes possuem espaçamento, alinhamento, tipografia, controles responsivos e feedback de hover/foco; os chamadores possuem estado e ações de negócio.
+- Use o Tooltip do Shadcn-Vue (ou `MdTooltip`) para dicas; não use atributos `title` nativos de HTML. Props de título de componente para cabeçalhos visíveis não têm relação com isso.
+- Janelas modais usam `Dialog`, `MdDialogContent`, `MdDialogHeader` e `MdDialogFooter`; operações ativas usam `MdOperationDialog`. Mantenha a dispensa separada do cancelamento e retenha a confirmação para o cancelamento destrutivo. Áreas de trabalho de progresso locais da página e painéis flutuantes não modais retêm seus próprios contratos de interação.
+- Nunca coloque markup SVG bruto em um template. Adicione ou reutilize um componente em `components/icons/`.
 
-## Validation
+## Validação
 
-For frontend changes, run:
+Para alterações de frontend, execute:
 
 ```sh
 pnpm check:frontend
 ```
 
-Also run `pnpm check` when a change touches Rust-facing protocols, generated bindings, events, configuration, or packaging. Test affected UI flows in both themes and all supported locales when text or layout changes, and verify the minimum window size for responsive changes.
+Execute também `pnpm check` quando uma alteração tocar protocolos voltados ao Rust, bindings gerados, eventos, configuração ou empacotamento. Teste os fluxos de UI afetados em ambos os temas e em todos os locales suportados quando texto ou layout mudar, e verifique o tamanho mínimo da janela para alterações responsivas.

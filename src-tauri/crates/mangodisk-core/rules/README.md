@@ -1,46 +1,28 @@
-# Contributing declarative cleanup rules
+# Contribuindo com regras declarativas de limpeza
 
-MangoDisk keeps ordinary cleanup behavior in validated TOML resources. Use this guide to add filesystem cleanup rules for application and system caches, or project artifact rules for rebuildable output inside source projects. If cleanup requires a system command, an application API, shared-resource coordination, or special high-impact confirmation, implement a dedicated cleaner instead of weakening the declarative safety model.
+O MangoDisk mantém o comportamento comum de limpeza em recursos TOML validados. Use este guia para adicionar regras de limpeza de sistemas de arquivos para caches de aplicativos e do sistema, ou regras de artefatos de projeto para saídas reconstruíveis dentro de projetos de código-fonte. Se a limpeza exigir um comando do sistema, uma API de aplicativo, coordenação de recursos compartilhados ou confirmação especial de alto impacto, implemente um limpador dedicado em vez de enfraquecer o modelo de segurança declarativo.
 
-## Choose the correct rule type
+## Escolha o tipo de regra correto
 
-- Use a **filesystem rule** for a known cache, log, crash report, temporary directory, or other disposable location owned by the operating system, an installed application, or a developer tool.
-- Use a **project artifact rule** for rebuildable directories discovered inside source projects, such as `target`, `node_modules`, or framework build caches.
-- Use a **dedicated cleaner** when deletion requires application-specific logic, system commands, elevated privileges, shared blob awareness, or validation immediately before execution.
+- Use uma **regra de sistema de arquivos** para um cache conhecido, log, relatório de falha, diretório temporário ou outro local descartável pertencente ao sistema operacional, a um aplicativo instalado ou a uma ferramenta de desenvolvedor.
+- Use uma **regra de artefato de projeto** para diretórios reconstruíveis descobertos dentro de projetos de código-fonte, como `target`, `node_modules` ou caches de build de frameworks.
+- Use um **limpador dedicado** quando a exclusão exigir lógica específica do aplicativo, comandos do sistema, privilégios elevados, consciência de blobs compartilhados ou validação imediatamente antes da execução.
 
-Windows native cleanup must distinguish readable data from deletion access. The system-log
-cleaner probes `DELETE` access without changing files; when every candidate denies deletion
-permission to a non-elevated account, it reports `requiresElevation`. Native handler error
-`0x800702E4` has the same status.
-The fixed Windows `System32\LogFiles\WMI\RtBackup` trace-backup directory is excluded for every
-account, including elevated processes; do not change its SYSTEM-only ACL to enable cleanup.
-Unreadable eligible log directories cannot be reported as clean. Incomplete inventories block execution;
-incomplete post-cleanup inventories report verification failure rather than confirmed release.
-Items marked `requiresElevation` require restarting MangoDisk as administrator and rescanning.
-The in-app privileged check remains limited to previous Windows installations. Elevated access
-does not bypass locked files, ACLs, reparse-point checks, or verification. Item failures retain bounded path, stage,
-and native-error diagnostics.
+A limpeza nativa do Windows deve distinguir dados legíveis do acesso de exclusão. O limpador de logs do sistema sonda o acesso `DELETE` sem alterar arquivos; quando todos os candidatos negam permissão de exclusão a uma conta não elevada, ele reporta `requiresElevation`. O erro de manipulador nativo `0x800702E4` tem o mesmo status.
+O diretório fixo de backup de rastreamento do Windows `System32\LogFiles\WMI\RtBackup` é excluído para todas as contas, incluindo processos elevados; não altere sua ACL somente SYSTEM para habilitar a limpeza.
+Diretórios de log elegíveis ilegíveis não podem ser reportados como limpos. Inventários incompletos bloqueiam a execução; inventários incompletos pós-limpeza reportam falha de verificação em vez de liberação confirmada.
+Itens marcados como `requiresElevation` exigem reiniciar o MangoDisk como administrador e fazer uma nova varredura.
+A verificação privilegiada no aplicativo continua limitada a instalações anteriores do Windows. O acesso elevado não ignora arquivos bloqueados, ACLs, verificações de pontos de repetição (reparse points) nem verificação. Falhas de itens retêm diagnósticos limitados de caminho, estágio e erro nativo.
 
-The opt-in Windows system-temporary-file cleaner owns only the native Windows
-directory's `SystemTemp` child. It preserves the root, directories, read-only
-files, links/reparse points, and files modified within the last seven days.
-Incomplete inventories block execution; changed objects, locked files, and
-denied deletion access remain in place and are reported. It uses the existing
-permanent-deletion identity checks and never changes ACLs or takes ownership.
-Permission-limited scans require an administrator restart and rescan, not an
-in-app elevation helper. The retention window is a conservative product policy;
-the [Windows temporary-path contract](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettemppath2w)
-establishes this location's purpose and access boundary, not universal disposability.
+O limpador de arquivos temporários do sistema Windows, opcional, possui apenas o filho `SystemTemp` do diretório nativo do Windows. Ele preserva a raiz, os diretórios, os arquivos somente leitura, os links/pontos de repetição (reparse points) e os arquivos modificados nos últimos sete dias.
+Inventários incompletos bloqueiam a execução; objetos alterados, arquivos bloqueados e acesso de exclusão negado permanecem no local e são reportados. Ele usa as verificações de identidade de exclusão permanente existentes e nunca altera ACLs nem assume propriedade.
+Varreduras com permissão limitada exigem reinício como administrador e nova varredura, não um auxiliar de elevação no aplicativo. A janela de retenção é uma política de produto conservadora; o [contrato de caminho temporário do Windows](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettemppath2w)
+estabelece a finalidade e o limite de acesso deste local, não sua descartabilidade universal.
 
-The macOS additional-user-cache cleaner retains reviewed snapshots for failed and unselected
-sources across cleanup steps. Only successfully deleted sources leave the snapshot. Retries
-must recheck ownership, running processes, links, and metadata against the original review.
-Cache roots and descendants retain their physical identities, so replacing an object while
-preserving its size and modification time requires a new scan. Changed data must never be
-silently reauthorized. Execution diagnostics include the operation, source path, failure stage,
-and native cause, with bounded item details.
+O limpador de cache de usuários adicionais do macOS retém snapshots revisados para fontes com falha e não selecionadas entre as etapas de limpeza. Apenas fontes excluídas com sucesso saem do snapshot. Novas tentativas devem verificar novamente propriedade, processos em execução, links e metadados em relação à revisão original.
+As raízes de cache e seus descendentes retêm suas identidades físicas, portanto substituir um objeto preservando seu tamanho e horário de modificação exige uma nova varredura. Dados alterados nunca devem ser reautorizados silenciosamente. Os diagnósticos de execução incluem a operação, o caminho da fonte, o estágio da falha e a causa nativa, com detalhes de item limitados.
 
-## Directory layout
+## Layout de diretórios
 
 ```text
 rules/
@@ -60,15 +42,15 @@ rules/
     └── ...
 ```
 
-Filesystem paths are enforced as `filesystem/<platform>/<category>/<rule-id>.toml`. Project artifact files conventionally use `project-artifacts/<ecosystem>.toml`. Empty categories do not need placeholder directories.
+Os caminhos de sistemas de arquivos são exigidos como `filesystem/<platform>/<category>/<rule-id>.toml`. Os arquivos de artefatos de projeto usam, por convenção, `project-artifacts/<ecosystem>.toml`. Categorias vazias não precisam de diretórios fictícios.
 
-Before adding a rule, find the nearest existing example and verify the cleanup boundary against authoritative documentation or the application's current on-disk behavior. A rule must select only disposable or reproducible data. Do not target settings, credentials, databases, project source, personal files, user-managed models, or data whose ownership is uncertain.
+Antes de adicionar uma regra, encontre o exemplo existente mais próximo e verifique o limite de limpeza com documentação autoritativa ou com o comportamento atual do aplicativo em disco. Uma regra deve selecionar apenas dados descartáveis ou reproduzíveis. Não selecione configurações, credenciais, bancos de dados, código-fonte de projetos, arquivos pessoais, modelos gerenciados pelo usuário nem dados cuja propriedade seja incerta.
 
-## Filesystem rules
+## Regras de sistema de arquivos
 
-Filesystem rules use schema version 3. The build validates and embeds every TOML file, then the runtime parses the embedded source again with the same schema.
+As regras de sistema de arquivos usam a versão 3 do schema. O build valida e incorpora todos os arquivos TOML; em seguida, o tempo de execução analisa novamente a fonte incorporada com o mesmo schema.
 
-Start with this minimal example and replace every example value:
+Comece com este exemplo mínimo e substitua todos os valores de exemplo:
 
 ```toml
 id = "dev.example-cache"
@@ -107,33 +89,33 @@ verified_platform = "macos"
 references = ["https://example.com/official-cache-documentation"]
 ```
 
-See [`filesystem/macos/development/dev.pnpm-cache.toml`](filesystem/macos/development/dev.pnpm-cache.toml) for a real rule.
+Veja [`filesystem/macos/development/dev.pnpm-cache.toml`](filesystem/macos/development/dev.pnpm-cache.toml) para uma regra real.
 
-### Identity, selection, and risk
+### Identidade, seleção e risco
 
-- `id` must use lowercase ASCII letters, digits, `.`, `-`, or `_`, and the file name must be `<id>.toml`.
-- `rule_version` must be positive. Increment it when a change alters roots, matching, execution, risk, applicability, or verification semantics.
-- `platform` is `macos`, `windows`, or `linux`.
-- `category` is `system`, `browser`, `application`, `development`, `ai`, or `container`.
-- `risk` is `safe`, `recoverable`, or `highImpact`.
-- `default_selected = true` is allowed only for `safe` rules. `recommended_selected` controls the shared recommendation used by the desktop app and the CLI `recommended` selection. A `recoverable` rule may be recommended only when every root has `verified_rebuildable = true`.
-- When `requires_app_close = true`, `required_stopped_processes` must contain the individual executable names that preflight must stop or reject. When application closure is not required, the list must be empty.
+- `id` deve usar letras ASCII minúsculas, dígitos, `.`, `-` ou `_`, e o nome do arquivo deve ser `<id>.toml`.
+- `rule_version` deve ser positivo. Incremente-o quando uma alteração modificar raízes, correspondência, execução, risco, aplicabilidade ou semântica de verificação.
+- `platform` é `macos`, `windows` ou `linux`.
+- `category` é `system`, `browser`, `application`, `development`, `ai` ou `container`.
+- `risk` é `safe`, `recoverable` ou `highImpact`.
+- `default_selected = true` é permitido apenas para regras `safe`. `recommended_selected` controla a recomendação compartilhada usada pelo aplicativo desktop e pela seleção `recommended` da CLI. Uma regra `recoverable` pode ser recomendada apenas quando todas as raízes têm `verified_rebuildable = true`.
+- Quando `requires_app_close = true`, `required_stopped_processes` deve conter os nomes individuais dos executáveis que a verificação prévia (preflight) deve interromper ou rejeitar. Quando o fechamento do aplicativo não é necessário, a lista deve estar vazia.
 
-### Applicability
+### Aplicabilidade
 
-Every filesystem rule must contain at least one `[[applicability]]` probe. Applicability avoids unnecessary traversal; it never relaxes root or matcher safety. A known-inapplicable rule is skipped, while missing or incomplete inventory data keeps the rule eligible for scanning.
+Toda regra de sistema de arquivos deve conter pelo menos uma sonda `[[applicability]]`. A aplicabilidade evita travessias desnecessárias; ela nunca afrouxa a segurança de raiz ou de correspondência. Uma regra conhecidamente inaplicável é ignorada, enquanto dados de inventário ausentes ou incompletos mantêm a regra elegível para varredura.
 
-Supported probes are:
+As sondas compatíveis são:
 
 - `anyRootExists`
 - `pathExists`
-- `applicationInstalled` and `applicationVersion`
+- `applicationInstalled` e `applicationVersion`
 - `executableAvailable`
-- `systemVersion`, `fileSystemIn`, and `capabilityAvailable`
+- `systemVersion`, `fileSystemIn` e `capabilityAvailable`
 - `processRunning`
-- `anyOf`, `allOf`, and `not`
+- `anyOf`, `allOf` e `not`
 
-Multiple identifiers or names within one probe are aliases for the same fact and match when any alias succeeds. Use `allOf` when independent facts must all be true. Portable applications may not appear in the installation inventory, so combine identity evidence with a controlled path when appropriate:
+Múltiplos identificadores ou nomes dentro de uma sonda são aliases para o mesmo fato e correspondem quando qualquer alias tem sucesso. Use `allOf` quando fatos independentes devem ser todos verdadeiros. Aplicativos portáteis podem não aparecer no inventário de instalação; portanto, combine evidência de identidade com um caminho controlado quando apropriado:
 
 ```toml
 [[applicability]]
@@ -144,90 +126,90 @@ items = [
 ]
 ```
 
-Arbitrary absolute paths, environment variables, and command execution are not valid applicability inputs.
+Caminhos absolutos arbitrários, variáveis de ambiente e execução de comandos não são entradas válidas de aplicabilidade.
 
-### Roots
+### Raízes
 
-Every root template must begin with one controlled, lowercase variable and use `/` separators. Supported variables are:
+Todo modelo de raiz deve começar com uma variável controlada em minúsculas e usar separadores `/`. As variáveis compatíveis são:
 
-- All platforms: `${home}`, `${temp}`, `${system_root}`
+- Todas as plataformas: `${home}`, `${temp}`, `${system_root}`
 - macOS: `${user_library}`, `${application_support}`, `${darwin_user_cache}`
 - Windows: `${local_app_data}`, `${roaming_app_data}`, `${program_files}`, `${program_data}`
 
-Linux filesystem rules are limited to user-owned, non-privileged cleanup: their roots
-must resolve under `${home}` or to the current user's `${temp}`, they must not use
-`${system_root}` or other system-owned locations, and `[execution]` must stay on the
-declarative `deleteMatchingContents` verify-only strategy. This keeps every Linux rule
-executable without elevation while shared temporary directories remain guarded by the
-engine's ownership and snapshot checks before deletion.
+As regras de sistema de arquivos do Linux se limitam à limpeza pertencente ao usuário e sem privilégios: suas raízes
+devem resolver para dentro de `${home}` ou para o `${temp}` do usuário atual, não devem usar
+`${system_root}` nem outros locais pertencentes ao sistema, e `[execution]` deve permanecer na
+estratégia declarativa `deleteMatchingContents` com apenas verificação. Isso mantém toda regra Linux
+executável sem elevação, enquanto diretórios temporários compartilhados permanecem protegidos pelas
+verificações de propriedade e snapshot do motor antes da exclusão.
 
-A static root needs only `template`. Use `kind = "childDirectories"` only when the rule must expand direct child directories through `child_names`, `child_prefixes`, `include_all_children`, or fixed `suffixes`. The validator rejects parent traversal, uncontrolled variables, duplicate roots, protected locations, unsafe expansion, and broad matching outside recognized cache or verified rebuildable boundaries.
+Uma raiz estática precisa apenas de `template`. Use `kind = "childDirectories"` somente quando a regra precisar expandir diretórios filhos diretos por meio de `child_names`, `child_prefixes`, `include_all_children` ou `suffixes` fixos. O validador rejeita travessia de diretório pai, variáveis não controladas, raízes duplicadas, locais protegidos, expansão insegura e correspondência ampla fora de limites de cache reconhecidos ou de locais reconstruíveis verificados.
 
-Read failures during optional root discovery and filesystem traversal preserve readable results
-and contribute to the scan's `readFailureCount` diagnostic. Intentional link, mount, and cloud
-placeholder skips remain safety skips and do not imply a read failure. On macOS, `accessLimited`
-indicates a protected app-data read for which privacy settings may help; ordinary BSD/ACL denial
-does not set it. Scanning still waits for the user's response to a native authorization prompt.
+Falhas de leitura durante a descoberta opcional de raiz e a travessia do sistema de arquivos preservam os resultados legíveis
+e contribuem para o diagnóstico `readFailureCount` da varredura. Ignorar intencionalmente links, montagens e
+marcadores de nuvem (cloud placeholders) continua sendo uma precaução de segurança e não implica falha de leitura. No macOS, `accessLimited`
+indica uma leitura protegida de dados de aplicativo para a qual as configurações de privacidade podem ajudar; uma negação comum de BSD/ACL
+não define esse estado. A varredura ainda aguarda a resposta do usuário a um prompt nativo de autorização.
 
-### Matchers and execution
+### Correspondências e execução
 
-Supported matcher kinds are `all`, `nameEquals`, `nameGlob`, `extensionIn`, `pathSegmentIn`, `olderThan`, `largerThan`, `smallerThan`, `maxDepth`, `allOf`, `anyOf`, and `not`. Name matchers accept names, not paths; `nameGlob` does not support `**`. Numeric age, size, and depth values must be greater than zero.
+Os tipos de correspondência compatíveis são `all`, `nameEquals`, `nameGlob`, `extensionIn`, `pathSegmentIn`, `olderThan`, `largerThan`, `smallerThan`, `maxDepth`, `allOf`, `anyOf` e `not`. Correspondências de nome aceitam nomes, não caminhos; `nameGlob` não oferece suporte a `**`. Valores numéricos de idade, tamanho e profundidade devem ser maiores que zero.
 
-Declarative filesystem rules support `deleteMatchingContents` and the opt-in `deleteWholeRoot` strategy. A broad `all` matcher is appropriate only when the root itself is a narrowly defined cache or a verified rebuildable location. Prefer a narrower matcher whenever the root contains mixed-purpose data.
+Regras declarativas de sistema de arquivos oferecem suporte a `deleteMatchingContents` e à estratégia opcional `deleteWholeRoot`. Uma correspondência ampla `all` só é apropriada quando a própria raiz é um cache definido de forma restrita ou um local reconstruível verificado. Prefira uma correspondência mais estreita sempre que a raiz contiver dados de finalidades mistas.
 
-`deleteWholeRoot` removes the verified root directly with a lightweight root identity check and a cancellable traversal that records observed removals. Failures leave surviving entries at their original paths; execution does not create staging directories or attempt rollback. It is accepted only for static roots with `verified_rebuildable = true`, an exact `all` matcher, and `default_selected = false`. Runtime execution also requires the rule to own the complete root and a native aggregate to read every entry without links or permission skips. Source-scoped cleanup, nested rule ownership, unsupported native traversal, and any skipped entry automatically fall back to `deleteMatchingContents` before mutation. A failed deletion is reported without retrying through another strategy.
+`deleteWholeRoot` remove a raiz verificada diretamente com uma verificação leve de identidade de raiz e uma travessia cancelável que registra as remoções observadas. Falhas deixam as entradas sobreviventes em seus caminhos originais; a execução não cria diretórios de preparação (staging) nem tenta reversão. Ela é aceita apenas para raízes estáticas com `verified_rebuildable = true`, uma correspondência exata `all` e `default_selected = false`. A execução em tempo de execução também exige que a regra possua a raiz completa e um agregado nativo capaz de ler cada entrada sem links nem omissões por permissão. Limpeza com escopo de fonte, propriedade aninhada de regras, travessia nativa não compatível e qualquer entrada ignorada retornam automaticamente a `deleteMatchingContents` antes da modificação. Uma exclusão com falha é reportada sem tentar novamente por outra estratégia.
 
-### Verification
+### Verificação
 
-Production resources accept the `verified`, `stable`, and `deprecated` lifecycles. `candidate` and `disabled` rules are rejected from the production catalog. `evidence` must explain why the selected data is disposable and what important data remains outside the boundary. `verified_at` uses `YYYY-MM-DD`, and `verified_platform` must match the rule platform. Add authoritative HTTPS `references` whenever they are available.
+Recursos de produção aceitam os ciclos de vida `verified`, `stable` e `deprecated`. Regras `candidate` e `disabled` são rejeitadas do catálogo de produção. `evidence` deve explicar por que os dados selecionados são descartáveis e quais dados importantes permanecem fora do limite. `verified_at` usa `YYYY-MM-DD`, e `verified_platform` deve corresponder à plataforma da regra. Adicione `references` HTTPS autoritativas sempre que estiverem disponíveis.
 
-For narrowly defined caches, official documentation or upstream implementation that establishes ownership, disposability, and regeneration may be combined with isolated scan, dry-run, deletion, and adjacent-data preservation tests. Installing every application is not required. Shared framework caches still need application-specific path evidence; offline content, databases, shared stores, and active installation or version-retention logic require application-level validation. Record the actual evidence and validation method; `verified` must not imply an installation test that was not performed.
+Para caches definidos de forma restrita, documentação oficial ou a implementação upstream que estabeleça propriedade, descartabilidade e regeneração podem ser combinadas com testes isolados de varredura, simulação (dry-run), exclusão e preservação de dados adjacentes. Não é necessário instalar todos os aplicativos. Caches compartilhados de frameworks ainda precisam de evidência de caminho específica do aplicativo; conteúdo offline, bancos de dados, armazenamentos compartilhados e lógica ativa de instalação ou retenção de versões exigem validação no nível do aplicativo. Registre a evidência real e o método de validação; `verified` não deve implicar um teste de instalação que não foi realizado.
 
-Rule comments and verification evidence are developer-facing text and must use English so the automated source check can validate a consistent public rule catalog. Do not add UI names, descriptions, impact text, localization keys, or locale fields to TOML.
+Comentários de regras e evidências de verificação são textos voltados a desenvolvedores e devem usar inglês para que a verificação automatizada de fontes possa validar um catálogo público de regras consistente. Não adicione nomes de UI, descrições, textos de impacto, chaves de localização ou campos de locale ao TOML.
 
-### Protected personal and high-value data
+### Dados pessoais e de alto valor protegidos
 
-The home root, Downloads, Documents, Desktop, project directories, repositories, credentials, and cloud-synchronized folders are not ordinary cache roots. Do not combine them with `all`, broad name patterns, or composite matchers that can degrade into whole-root selection.
+A raiz inicial (home), Downloads, Documents, Desktop, diretórios de projetos, repositórios, credenciais e pastas sincronizadas com a nuvem não são raízes de cache comuns. Não os combine com `all`, padrões de nome amplos ou correspondências compostas que possam degradar para seleção da raiz inteira.
 
-`system.stale-partial-downloads` is the only Downloads exception. It is accepted only when all of these conditions remain true:
+`system.stale-partial-downloads` é a única exceção para Downloads. Ela é aceita apenas quando todas estas condições permanecem verdadeiras:
 
-- the rule ID is exactly `system.stale-partial-downloads`;
-- the normalized root is exactly the current user's Downloads directory;
-- `risk` is `recoverable` and `default_selected` is `false`;
-- the matcher is `allOf`;
-- `olderThan` is at least seven days;
-- `extensionIn` contains only `crdownload`, `download`, `partial`, and `part`;
-- `maxDepth` is no greater than three.
+- o ID da regra é exatamente `system.stale-partial-downloads`;
+- a raiz normalizada é exatamente o diretório Downloads do usuário atual;
+- `risk` é `recoverable` e `default_selected` é `false`;
+- a correspondência é `allOf`;
+- `olderThan` é de pelo menos sete dias;
+- `extensionIn` contém apenas `crdownload`, `download`, `partial` e `part`;
+- `maxDepth` não é maior que três.
 
-AI models are high-value downloadable data. Ordinary filesystem rules must not target project directories, Ollama model stores, LM Studio data, or user-managed model directories. The dedicated AI model cleaner validates official store layouts, shared blobs, links, and each model immediately before execution.
+Modelos de IA são dados valiosos e baixáveis. Regras comuns de sistema de arquivos não devem selecionar diretórios de projetos, armazenamentos de modelos do Ollama, dados do LM Studio nem diretórios de modelos gerenciados pelo usuário. O limpador dedicado de modelos de IA valida os layouts oficiais de armazenamento, blobs compartilhados, links e cada modelo imediatamente antes da execução.
 
-ComfyUI models use the dedicated `special.ai-model-comfyui` adapter. It reads current
-Desktop shared/per-install model directories, legacy Desktop `basePath` and model-path YAML,
-and marker-verified manual installations found by the existing project scan/index. YAML
-paths resolve relative to their configuration file; model-directory settings must identify
-explicit locations. Discovery does not execute Python, launch scripts, or YAML tags.
+Modelos do ComfyUI usam o adaptador dedicado `special.ai-model-comfyui`. Ele lê os diretórios de modelos
+compartilhados/por instalação atuais do Desktop, o `basePath` legado do Desktop e o YAML de caminho de modelos,
+além de instalações manuais verificadas por marcador encontradas pela varredura/índice de projetos existente. Caminhos
+YAML são resolvidos em relação ao seu arquivo de configuração; as configurações de diretório de modelos devem identificar
+localizações explícitas. A descoberta não executa Python, não lança scripts nem tags YAML.
 
-Only weight files and complete Diffusers packages are selectable, never an installation or
-shared-data root. Inputs, outputs, workflows, datasets, custom nodes, partial downloads, and
-links/reparse points are excluded. Models remain opt-in; shared or user-trained weights
-may have no downloadable replacement. Running ComfyUI or Python processes do not block
-selection or deletion and are never terminated by this cleaner. Deletion may affect running
-tasks or later model loads. Files that cannot be removed are skipped with native diagnostics;
-other selected models continue. Execution rechecks
-configuration membership, physical identities, and metadata snapshots before mutation.
-Configuration reads and model traversal are bounded; incomplete evidence blocks cleanup.
-Explicit Diffusers directories retain whole-package selection when general model roots
-duplicate or contain them; incomplete packages never become individual weight sources.
-Regular Finder `.DS_Store` metadata is included in selected packages; temporary downloads,
-unknown hidden data, links, and directories using that metadata name remain excluded.
-See the [official model-path documentation](https://docs.comfy.org/basic-concepts/models)
-and [Desktop data locations](https://docs.comfy.org/installation/desktop/macos).
+Apenas arquivos de pesos e pacotes completos do Diffusers podem ser selecionados, nunca uma instalação ou
+raiz de dados compartilhados. Entradas, saídas, fluxos de trabalho, conjuntos de dados, nós personalizados, downloads parciais e
+links/pontos de repetição (reparse points) são excluídos. Modelos continuam opcionais; pesos compartilhados ou treinados pelo usuário
+podem não ter substituto baixável. Processos do ComfyUI ou Python em execução não bloqueiam
+seleção ou exclusão e nunca são encerrados por este limpador. A exclusão pode afetar tarefas em execução
+ou carregamentos posteriores de modelos. Arquivos que não podem ser removidos são ignorados com diagnósticos nativos;
+outros modelos selecionados continuam. A execução verifica novamente
+a associação à configuração, as identidades físicas e os snapshots de metadados antes da modificação.
+Leituras de configuração e travessia de modelos são limitadas; evidência incompleta bloqueia a limpeza.
+Diretórios explícitos do Diffusers mantêm a seleção do pacote inteiro quando raízes gerais de modelos
+os duplicam ou contêm; pacotes incompletos nunca se tornam fontes individuais de pesos.
+Metadados comuns do Finder `.DS_Store` são incluídos nos pacotes selecionados; downloads temporários,
+dados ocultos desconhecidos, links e diretórios que usam esse nome de metadado permanecem excluídos.
+Veja a [documentação oficial de caminhos de modelos](https://docs.comfy.org/basic-concepts/models)
+e [localizações de dados do Desktop](https://docs.comfy.org/installation/desktop/macos).
 
-## Project artifact rules
+## Regras de artefatos de projeto
 
-Project artifact rules use schema version 1 and describe rebuildable output inside a recognized source project. They are always recoverable and opt-in.
+Regras de artefatos de projeto usam a versão 1 do schema e descrevem saídas reconstruíveis dentro de um projeto de código-fonte reconhecido. Elas são sempre recuperáveis e opcionais.
 
-Start with this minimal example:
+Comece com este exemplo mínimo:
 
 ```toml
 id = "project.example-build-artifacts"
@@ -251,67 +233,66 @@ evidence = ["https://example.com/official-build-directory-documentation"]
 verified_at = "2026-08-05"
 ```
 
-See [`project-artifacts/node.toml`](project-artifacts/node.toml) for a real rule.
+Veja [`project-artifacts/node.toml`](project-artifacts/node.toml) para uma regra real.
 
-Project artifact constraints are intentionally narrow:
+As restrições de artefatos de projeto são intencionalmente restritas:
 
-- `id` must start with `project.` and use lowercase ASCII tokens separated by dots.
-- `platforms` must contain one or both of `macos` and `windows`, without duplicates.
-- `category`, `risk`, and `default_selected` must remain `development`, `recoverable`, and `false`.
-- `[match]` must identify the project with at least one `file_names_any` or extension-like `file_suffixes_any` value. Use `relative_paths_all` and `relative_paths_any` only for additional project evidence.
-- Every rule needs at least one artifact. `relativeDirectory` selects a normalized relative path. `descendantDirectory` selects one directory name below the project and requires `max_depth` from 1 through 64.
-- Artifact paths must be normalized relative paths without absolute roots, `.` segments, or `..` traversal.
-- Verification lifecycle must be `verified`, evidence must contain at least one authoritative HTTPS source, and `verified_at` must use `YYYY-MM-DD`.
+- `id` deve começar com `project.` e usar tokens ASCII minúsculos separados por pontos.
+- `platforms` deve conter um ou ambos entre `macos` e `windows`, sem duplicatas.
+- `category`, `risk` e `default_selected` devem permanecer como `development`, `recoverable` e `false`.
+- `[match]` deve identificar o projeto com pelo menos um valor `file_names_any` ou `file_suffixes_any` semelhante a extensão. Use `relative_paths_all` e `relative_paths_any` apenas como evidência adicional do projeto.
+- Toda regra precisa de pelo menos um artefato. `relativeDirectory` seleciona um caminho relativo normalizado. `descendantDirectory` seleciona um nome de diretório abaixo do projeto e exige `max_depth` de 1 a 64.
+- Caminhos de artefatos devem ser caminhos relativos normalizados, sem raízes absolutas, segmentos `.` ou travessia `..`.
+- O ciclo de vida de verificação deve ser `verified`, a evidência deve conter pelo menos uma fonte HTTPS autoritativa e `verified_at` deve usar `YYYY-MM-DD`.
 
-### Authored content protection
+### Proteção de conteúdo autoral
 
-Project artifact preview and final deletion preflight inspect the selected tree for nested
-`.git` entries and `*-keypair.json` files. An enclosing Git repository also requires a successful,
-isolated `git ls-files` probe confirming that the artifact contains no tracked files. Missing Git,
-unreadable entries, cancellation, or a five-second Git probe timeout prevents deletion. Entry-name
-inspection shares the bounded measurement traversal and has no independent wall-clock or entry
-limit. Protected or incomplete artifacts remain visible as limited sources; complete sibling
-projects stay independently selectable. This protects authored data such as Anchor program keys
-stored under `target/deploy`, including files introduced after preview.
+A prévia de artefatos de projeto e a verificação prévia (preflight) de exclusão final inspecionam a árvore selecionada em busca de entradas
+`.git` aninhadas e arquivos `*-keypair.json`. Um repositório Git que contém o artefato também exige uma sonda
+`git ls-files` isolada e bem-sucedida, confirmando que o artefato não contém arquivos rastreados. Git ausente,
+entradas ilegíveis, cancelamento ou um tempo limite de cinco segundos na sonda Git impedem a exclusão. A inspeção de nomes
+de entradas compartilha a travessia limitada de medição e não tem limite independente de tempo de relógio ou de número de entradas.
+Artefatos protegidos ou incompletos permanecem visíveis como fontes limitadas; projetos irmãos completos
+continuam selecionáveis de forma independente. Isso protege dados autorais, como chaves de programas Anchor
+armazenadas em `target/deploy`, incluindo arquivos introduzidos após a prévia.
 
-### Codex worktree discovery
+### Descoberta de worktrees do Codex
 
-Regular deep-cleanup scans also inspect `${CODEX_HOME}/worktrees` (or
-`~/.codex/worktrees` when the environment variable is unset). Discovery is bounded
-to the `worktrees/ID/checkout` layout and requires matching reciprocal Git
-pointers without linked path components. Optional `codex-thread.json` metadata
-is not required inside this configured location. Outside it, Codex ownership
-metadata remains necessary for Codex-specific classification. Identified
-checkouts use the existing opt-in project
-artifact rules; there is no separate scan mode or cleanup workflow. Explicit
-project scopes are not expanded. Sessions, images, credentials, plugins, source
-files, and entire worktrees are never cleanup targets.
+Varreduras regulares de limpeza profunda também inspecionam `${CODEX_HOME}/worktrees` (ou
+`~/.codex/worktrees` quando a variável de ambiente não está definida). A descoberta é limitada
+ao layout `worktrees/ID/checkout` e exige ponteiros Git recíprocos correspondentes, sem componentes
+de caminho vinculados. Metadados opcionais `codex-thread.json` não são necessários dentro deste local
+configurado. Fora dele, metadados de propriedade do Codex continuam necessários para a classificação
+específica do Codex. Checkouts identificados usam as regras de artefatos de projeto
+opcionais existentes; não há modo de varredura nem fluxo de limpeza separados. Escopos explícitos
+de projeto não são expandidos. Sessões, imagens, credenciais, plugins, arquivos de código-fonte
+e worktrees inteiros nunca são alvos de limpeza.
 
-Codex artifact sources use the existing per-source close requirement while
-Codex or ChatGPT is running. Global Node, Python, Cargo, and other build processes
-are not associated with a checkout and are neither blockers nor close targets.
-Sources remain selectable. Confirmation uses the shared optional application
-close panel, unchecked by default; only selected sources contribute to it.
-Core resolves trusted project rule IDs to the fixed Codex/ChatGPT application
-set, never to process names supplied by the frontend.
-Execution rechecks checkout provenance and running processes before deletion;
-unavailable process inventory fails closed for these artifacts, not other projects.
-Execution reports known writers as `blocked` / `runningProcesses` (or `partial`
-when other sources were cleaned). Changed Git associations and unavailable
-process inspection report `preflightFailed`, with distinct diagnostic reasons.
-For disposable real Git worktree deletion and log validation, run
+Fontes de artefatos do Codex usam o requisito existente de fechamento por fonte enquanto
+Codex ou ChatGPT estiver em execução. Processos globais de Node, Python, Cargo e outros builds
+não estão associados a um checkout e não são bloqueadores nem alvos de fechamento.
+Fontes permanecem selecionáveis. A confirmação usa o painel compartilhado opcional de fechamento de
+aplicativo, desmarcado por padrão; apenas fontes selecionadas contribuem para ele.
+O Core resolve IDs de regras de projeto confiáveis para o conjunto fixo de aplicativos Codex/ChatGPT,
+nunca para nomes de processos fornecidos pelo frontend.
+A execução verifica novamente a procedência do checkout e os processos em execução antes da exclusão;
+inventário de processos indisponível falha de forma segura (fail closed) para estes artefatos, não para outros projetos.
+A execução reporta gravadores conhecidos como `blocked` / `runningProcesses` (ou `partial`
+quando outras fontes foram limpas). Associações Git alteradas e inspeção de processos indisponível
+reportam `preflightFailed`, com razões de diagnóstico distintas.
+Para exclusão e validação de logs reais de worktrees Git descartáveis, execute
 `cargo test -p mangodisk-core codex_real_git_worktree_deletion_and_diagnostics -- --ignored --nocapture --test-threads=1`.
-With Codex or ChatGPT running, this test checks the live app guard, then injects deterministic process
-states for failure and idle scenarios; Git validation and deletion remain real.
-It never targets existing user worktrees or terminates running applications.
+Com Codex ou ChatGPT em execução, este teste verifica a proteção do aplicativo ativo e então injeta estados
+determinísticos de processos para cenários de falha e ociosidade; validação e exclusão Git permanecem reais.
+Ele nunca seleciona worktrees existentes do usuário nem encerra aplicativos em execução.
 
-## User-facing text
+## Texto voltado ao usuário
 
-Rule execution data and UI presentation remain separate. Locale entries are optional at the schema level because MangoDisk can derive a readable fallback name from the rule ID. For a complete user-facing contribution, add `name`, `description`, and `impact` under `cleanupRules.entries.<rule-id>` in every supported file under [`src/locales`](../../../../src/locales). If you cannot provide a reliable translation, mention it in the pull request instead of adding unreviewed machine-translated text.
+Os dados de execução de regras e a apresentação da UI permanecem separados. Entradas de locale são opcionais no nível do schema porque o MangoDisk pode derivar um nome fallback legível a partir do ID da regra. Para uma contribuição completa voltada ao usuário, adicione `name`, `description` e `impact` em `cleanupRules.entries.<rule-id>` em todos os arquivos compatíveis sob [`src/locales`](../../../../src/locales). Se você não puder fornecer uma tradução confiável, mencione isso no pull request em vez de adicionar texto traduzido por máquina sem revisão.
 
-## Validation
+## Validação
 
-Run the focused source and schema checks while developing:
+Execute as verificações focadas de fonte e schema durante o desenvolvimento:
 
 ```sh
 pnpm check:rule-sources
@@ -319,21 +300,21 @@ cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core declarative_sc
 cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core project_artifact_schema
 ```
 
-Before opening a pull request, run the repository checks:
+Antes de abrir um pull request, execute as verificações do repositório:
 
 ```sh
 pnpm check
 cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core
 ```
 
-The build recursively validates all TOML resources, including schema fields, platform variables, risk, lifecycle, matchers, root boundaries, applicability, process policy, and catalog overlap. Validation failures include the source file and the rejected boundary. Do not bypass a failure with a broader root, weaker matcher, or dedicated Rust branch for one rule ID.
+O build valida recursivamente todos os recursos TOML, incluindo campos de schema, variáveis de plataforma, risco, ciclo de vida, correspondências, limites de raiz, aplicabilidade, política de processos e sobreposição de catálogo. Falhas de validação incluem o arquivo de origem e o limite rejeitado. Não contorne uma falha com uma raiz mais ampla, uma correspondência mais fraca ou um branch Rust dedicado para um único ID de regra.
 
-## Pull request checklist
+## Checklist de pull request
 
-- The rule uses the correct filesystem or project artifact schema.
-- Official documentation or reproducible evidence confirms the cleanup boundary.
-- The rule excludes settings, credentials, source code, personal content, databases, and other durable data.
-- IDs, paths, categories, platforms, risks, and versions follow the schema.
-- Applicability and matchers are as narrow as practical.
-- User-facing text is kept in locale resources rather than TOML.
-- Focused and complete validation commands pass on every affected platform, or the pull request clearly states which platform could not be validated.
+- A regra usa o schema correto de sistema de arquivos ou de artefato de projeto.
+- Documentação oficial ou evidência reproduzível confirma o limite de limpeza.
+- A regra exclui configurações, credenciais, código-fonte, conteúdo pessoal, bancos de dados e outros dados duráveis.
+- IDs, caminhos, categorias, plataformas, riscos e versões seguem o schema.
+- Aplicabilidade e correspondências são tão restritas quanto praticável.
+- Texto voltado ao usuário fica em recursos de locale, não no TOML.
+- Comandos de validação focados e completos passam em todas as plataformas afetadas, ou o pull request indica claramente qual plataforma não pôde ser validada.

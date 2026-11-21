@@ -5,7 +5,7 @@
 <p align="center">é©ç”¨æ–¼ <b>macOS</b>ã€<b>Windows</b> èˆ‡ <b>Linux</b> çš„ç£ç¢Ÿæ¸…ç†ã€å„²å­˜ç©ºé–“åˆ†æžèˆ‡éš±ç§ä¿è­·å·¥å…·</p>
 
 <p align="center">
-  <a href="README.md">English</a> Â· <a href="README.zh-CN.md">ç®€ä½“ä¸­æ–‡</a> Â· ç¹é«”ä¸­æ–‡ Â· <a href="README.ja.md">æ—¥æœ¬èªž</a> Â· <a href="README.ko.md">í•œêµ­ì–´</a> Â· <a href="README.ru.md">Ð ÑƒÑÑÐºÐ¸Ð¹</a>
+  <a href="README.md">English</a> Â· <a href="README.zh-CN.md">ç®€ä½“ä¸­æ–‡</a> Â· ç¹é«”ä¸­æ–‡ Â· <a href="README.ja.md">æ—¥æœ¬èªž</a> Â· <a href="README.ko.md">í•œêµ­ì–´</a> Â· <a href="README.ru.md">Ð ÑƒÑÑÐºÐ¸Ð¹</a> Â· <a href="README.pt-BR.md">Português (Brasil)</a>
 </p>
 
 <p align="center">

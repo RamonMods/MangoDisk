@@ -1,79 +1,79 @@
-# MangoDisk Contribution Guidelines
+# Diretrizes de contribuição do MangoDisk
 
-These rules apply to the entire repository. More specific guidance lives in [`src/AGENTS.md`](src/AGENTS.md) and [`src-tauri/AGENTS.md`](src-tauri/AGENTS.md); a child file adds only rules for its own subtree and does not replace this file.
+Estas regras se aplicam a todo o repositório. Orientações mais específicas ficam em [`src/AGENTS.md`](src/AGENTS.md) e [`src-tauri/AGENTS.md`](src-tauri/AGENTS.md); um arquivo filho adiciona apenas regras para sua própria subárvore e não substitui este arquivo.
 
-## Product and architecture
+## Produto e arquitetura
 
-MangoDisk is a Tauri 2 desktop application for safe disk analysis and cleanup. The Vue frontend is an adapter for user interaction. Rust owns filesystem access, platform safety, scan orchestration, cleanup execution, and persisted operational data.
+MangoDisk é um aplicativo desktop Tauri 2 para análise e limpeza segura de discos. O frontend Vue é um adaptador para a interação com o usuário. O Rust é responsável pelo acesso ao sistema de arquivos, pela segurança da plataforma, pela orquestração da varredura, pela execução da limpeza e pelos dados operacionais persistidos.
 
-Keep these domain boundaries stable:
+Mantenha estáveis estes limites de domínio:
 
-- `cleanup`: cleanup rules, previews, preflight, execution, and verification;
-- `storage`: disk analysis, large-file discovery, and exact duplicate detection;
-- `applications`: installed application identity and application-scoped capabilities;
-- `filesystem`: paths, traversal, permanent deletion, identity, and protection primitives;
-- `history` and `reporting`: operation records and machine-readable evidence;
-- `platform`: OS contracts and implementations, not product orchestration;
-- GUI, CLI, and Tauri commands: sibling adapters over the same Core use cases.
+- `cleanup`: regras de limpeza, prévias, pré-verificação, execução e verificação;
+- `storage`: análise de disco, descoberta de arquivos grandes e detecção exata de duplicatas;
+- `applications`: identidade de aplicativos instalados e capacidades escopo por aplicativo;
+- `filesystem`: caminhos, travessia, exclusão permanente, identidade e primitivas de proteção;
+- `history` e `reporting`: registros de operações e evidências legíveis por máquina;
+- `platform`: contratos e implementações do sistema operacional, não orquestração de produto;
+- GUI, CLI e comandos Tauri: adaptadores irmãos sobre os mesmos casos de uso do Core.
 
-`duplicates` is the exact-content duplicate domain. Use `duplicate_files` only for a file-specific entity, use case, command, event, or page. A future similar-photo feature belongs to a separate similarity domain and must not weaken exact duplicate semantics.
+`duplicates` é o domínio de duplicatas de conteúdo exato. Use `duplicate_files` apenas para uma entidade, caso de uso, comando, evento ou página específica de arquivo. Uma futura funcionalidade de fotos semelhantes pertence a um domínio de similaridade separado e não deve enfraquecer a semântica de duplicata exata.
 
-Do not create broad modules such as `common`, `misc`, `manager`, `optimization`, or a new service that aggregates unrelated domains. Product pages may combine domain results without moving that coordination into a giant Core service.
+Não crie módulos amplos como `common`, `misc`, `manager`, `optimization` ou um novo serviço que agregue domínios não relacionados. Páginas de produto podem combinar resultados de domínios sem mover essa coordenação para um serviço gigante no Core.
 
-## Implementation principles
+## Princípios de implementação
 
-1. Prefer the smallest practical design that preserves a clear boundary. Do not add abstractions for hypothetical reuse.
-2. Keep side effects at adapters and domain boundaries. Pure classification, formatting, and calculation must remain deterministic.
-3. Make behavior configurable when contributors can safely extend it as data. Cleanup rules should normally be declarative TOML validated at build time, not Rust branches.
-4. Do not couple rule resources to UI localization. Rules expose stable IDs, categories, risks, capabilities, and diagnostics; locale files own user-facing text.
-5. Preserve safety invariants: dry-run, protected paths, link/reparse-point handling, preflight, explicit confirmation, verification, and safe fallback when capabilities are unavailable.
-6. Never hide a compatibility or performance regression with an allow attribute, a global machine setting, or an undocumented fallback.
+1. Prefira o menor projeto prático que preserve um limite claro. Não adicione abstrações para reutilização hipotética.
+2. Mantenha efeitos colaterais nos adaptadores e nos limites de domínio. Classificação, formatação e cálculo puros devem permanecer determinísticos.
+3. Torne o comportamento configurável quando os colaboradores puderem estendê-lo com segurança como dados. Regras de limpeza normalmente devem ser TOML declarativo validado em tempo de build, e não ramificações em Rust.
+4. Não acople recursos de regras à localização da interface. As regras expõem IDs, categorias, riscos, capacidades e diagnósticos estáveis; os arquivos de locale são responsáveis pelo texto voltado ao usuário.
+5. Preserve os invariantes de segurança: simulação (dry-run), caminhos protegidos, tratamento de links/pontos de novo parse, pré-verificação, confirmação explícita, verificação e fallback seguro quando capacidades não estão disponíveis.
+6. Nunca esconda uma regressão de compatibilidade ou desempenho com um atributo allow, uma configuração global da máquina ou um fallback não documentado.
 
-## Naming and text
+## Nomenclatura e texto
 
-- Rust files and modules use `snake_case`; frontend, documentation, and resource file names use `kebab-case` unless an external tool requires another format.
-- Source comments, logs, diagnostic codes, test names, and assertions must be clear and consistent. All code comments must use idiomatic, professional English. Comments explain reasons, risks, and non-obvious boundaries rather than restating code.
-- User-facing text belongs in locale resources. Update every supported locale when contributor-visible behavior changes.
-- Use stable typed enums or codes across process and persistence boundaries. Do not make UI logic infer behavior from free-form messages.
+- Arquivos e módulos Rust usam `snake_case`; nomes de arquivos de frontend, documentação e recursos usam `kebab-case`, a menos que uma ferramenta externa exija outro formato.
+- Comentários no código-fonte, logs, códigos de diagnóstico, nomes de testes e asserções devem ser claros e consistentes. Todos os comentários de código devem usar inglês idiomático e profissional. Os comentários explicam razões, riscos e limites não óbvios, em vez de repetir o código.
+- Texto voltado ao usuário pertence aos recursos de locale. Atualize todos os locales suportados quando o comportamento visível ao colaborador mudar.
+- Use enums ou códigos tipados e estáveis entre limites de processo e de persistência. Não faça a lógica da interface inferir comportamento a partir de mensagens de formato livre.
 
-## Repository hygiene
+## Higiene do repositório
 
-- Existing and untracked changes belong to the user unless proven otherwise. Do not overwrite, delete, reformat, or include unrelated changes in a commit.
-- Do not edit generated or third-party source to implement application-wide behavior.
-- Import project-owned business modules from concrete files. Do not add business barrel files.
-- Keep generated reports out of production source directories and use short, stable paths that can be checked out on Windows.
-- Do not commit credentials, personal file contents, raw private paths in Markdown, build outputs, or local dependency directories.
-- Logs must identify the affected object, operation stage, native error/code, and outcome. Retain names and paths when they help reproduce or diagnose a failure; do not replace the only useful error or object identity with a hash. Exclude credentials, authorization tokens, document contents, and unrelated metadata. Escape control characters, bound command output, and summarize repetitive scan results. Integrity and protocol hashes retain their original purpose.
-- Do not push unless the user explicitly requests it. A request to commit does not authorize push.
+- Alterações existentes e não rastreadas pertencem ao usuário, salvo prova em contrário. Não sobrescreva, delete, reformate nem inclua alterações não relacionadas em um commit.
+- Não edite código-fonte gerado ou de terceiros para implementar comportamento de toda a aplicação.
+- Importe módulos de negócio pertencentes ao projeto a partir de arquivos concretos. Não adicione arquivos barrel de negócio.
+- Mantenha relatórios gerados fora dos diretórios de código-fonte de produção e use caminhos curtos e estáveis que possam ser feitos checkout no Windows.
+- Não faça commit de credenciais, conteúdos de arquivos pessoais, caminhos privados brutos em Markdown, saídas de build ou diretórios locais de dependências.
+- Os logs devem identificar o objeto afetado, o estágio da operação, o erro/código nativo e o resultado. Mantenha nomes e caminhos quando ajudarem a reproduzir ou diagnosticar uma falha; não substitua o único erro útil ou a identidade do objeto por um hash. Exclua credenciais, tokens de autorização, conteúdos de documentos e metadados não relacionados. Escape caracteres de controle, limte a saída de comandos e resuma resultados de varredura repetitivos. Hashes de integridade e de protocolo mantêm sua finalidade original.
+- Não faça push a menos que o usuário solicite explicitamente. Um pedido para fazer commit não autoriza push.
 
-## Workflow
+## Fluxo de trabalho
 
-1. Read the nearest `AGENTS.md` before changing code.
-2. Inspect the worktree and establish a behavior or performance baseline proportional to risk.
-3. Write a concise implementation plan for multi-step work and keep it updated when scope changes.
-4. Keep structural moves separate from behavior changes whenever Review would otherwise become ambiguous.
-5. Validate cross-platform behavior in an applicable macOS and Windows environment. If a platform is unavailable, document the unvalidated scope instead of claiming support from local results.
-6. For behavior or performance changes, describe the tested workload, environment, and observable result in the change description without committing raw machine reports or private data.
-7. Review the final diff for correctness, safety, privacy, platform fallbacks, naming, and stale documentation before committing.
-8. For macOS native UI inspection, stop running MangoDisk, Tauri dev, and Vite processes before building `pnpm tauri build --debug --bundles app --no-sign`. Launch and inspect the exact `target/debug/bundle/macos/MangoDisk.app` path; the raw `tauri dev` executable has no bundle ID and cannot be targeted reliably by macOS UI automation.
+1. Leia o `AGENTS.md` mais próximo antes de alterar o código.
+2. Inspecione o worktree e estabeleça uma linha de base de comportamento ou desempenho proporcional ao risco.
+3. Escreva um plano de implementação conciso para trabalhos com várias etapas e mantenha-o atualizado quando o escopo mudar.
+4. Mantenha movimentos estruturais separados de alterações de comportamento sempre que isso evitar ambiguidade na revisão.
+5. Valide o comportamento multiplataforma em ambientes aplicáveis de macOS e Windows. Se uma plataforma não estiver disponível, documente o escopo não validado em vez de afirmar suporte com base em resultados locais.
+6. Para alterações de comportamento ou desempenho, descreva a carga de trabalho testada, o ambiente e o resultado observável na descrição da alteração, sem fazer commit de relatórios brutos da máquina ou de dados privados.
+7. Revise o diff final quanto à correção, segurança, privacidade, fallbacks de plataforma, nomenclatura e documentação desatualizada antes de fazer commit.
+8. Para inspeção de interface nativa no macOS, pare os processos do MangoDisk, do Tauri dev e do Vite antes de compilar com `pnpm tauri build --debug --bundles app --no-sign`. Inicie e inspecione o caminho exato `target/debug/bundle/macos/MangoDisk.app`; o executável bruto do `tauri dev` não tem bundle ID e não pode ser direcionado de forma confiável pela automação de interface do macOS.
 
-## Required validation
+## Validação obrigatória
 
-Run the smallest applicable checks during development and the complete checks before submitting a change or preparing a release:
+Execute as verificações aplicáveis menores durante o desenvolvimento e as verificações completas antes de enviar uma alteração ou preparar uma versão:
 
 ```sh
 pnpm check
 cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core
 ```
 
-`pnpm build` runs frontend and Core tests before producing assets; Tauri packaging uses this gate through `beforeBuildCommand`. `pnpm check` also includes Core tests. `pnpm build:frontend` is the asset-only step used after tests by the validation pipeline; it is not a release validation entry point.
+`pnpm build` executa os testes do frontend e do Core antes de produzir os assets; o empacotamento Tauri usa este gate por meio de `beforeBuildCommand`. `pnpm check` também inclui os testes do Core. `pnpm build:frontend` é a etapa apenas de assets usada após os testes pelo pipeline de validação; não é um ponto de entrada de validação de versão.
 
-Cross-platform work must also run the same applicable checks in a Windows environment. When a required platform is unavailable, state that limitation in the change description. Performance changes require a reproducible before-and-after measurement appropriate to the affected path, but raw machine reports and private datasets must remain outside the repository.
+Trabalhos multiplataforma também devem executar as mesmas verificações aplicáveis em um ambiente Windows. Quando uma plataforma obrigatória não estiver disponível, indique essa limitação na descrição da alteração. Alterações de desempenho exigem uma medição reproducível de antes e depois apropriada ao caminho afetado, mas relatórios brutos da máquina e conjuntos de dados privados devem permanecer fora do repositório.
 
-Tests are required for high-risk logic, protocol compatibility, persistence migrations, safety boundaries, and regressions. Ordinary presentation-only changes may rely on type, build, and interaction checks when an automated test would not add meaningful confidence.
+Testes são obrigatórios para lógica de alto risco, compatibilidade de protocolo, migrações de persistência, limites de segurança e regressões. Alterações comuns apenas de apresentação podem depender de verificações de tipo, build e interação quando um teste automatizado não agregaria confiança significativa.
 
-## Public guidance
+## Orientação pública
 
-- Keep contributor guidance concise and place domain-specific instructions near the code or schema they govern. Add new top-level documentation only when it has a clear, durable audience.
-- Do not commit private research, raw machine reports, private datasets, credentials, or private release tooling. Durable architecture decisions may be documented publicly when they help contributors understand or extend the project.
-- Update public guidance in the same change when contributor-visible behavior or validation changes.
+- Mantenha as orientações de colaboração concisas e coloque instruções específicas de domínio perto do código ou do schema que elas governam. Adicione nova documentação de nível superior apenas quando houver um público claro e durável.
+- Não faça commit de pesquisas privadas, relatórios brutos da máquina, conjuntos de dados privados, credenciais ou ferramentas privadas de versão. Decisões de arquitetura duráveis podem ser documentadas publicamente quando ajudam os colaboradores a entender ou estender o projeto.
+- Atualize a orientação pública na mesma alteração quando o comportamento visível ao colaborador ou a validação mudar.

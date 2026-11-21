@@ -1,21 +1,23 @@
-# Linux bundle compatibility
+# Compatibilidade de bundles Linux
 
-Build with `pnpm tauri:build:linux` on Ubuntu 22.04 for each supported Linux
-architecture. Keep the glibc 2.35 baseline; moving the build to a newer Ubuntu
-release can prevent the bundles from running on older supported systems.
+Compile com `pnpm tauri:build:linux` no Ubuntu 22.04 para cada arquitetura Linux
+suportada. Mantenha a linha de base do glibc 2.35; mover a compilação para uma
+versão mais recente do Ubuntu pode impedir que os bundles rodem em sistemas
+suportados mais antigos.
 
-The build excludes `libwayland-*.so*` through `LINUXDEPLOY_EXCLUDED_LIBRARIES` so
-Mesa uses the host's matching Wayland libraries. Tauri CLI 2.12.1 also supplies
-the updated linuxdeploy and GTK plugin. The project AppRun delegates to Tauri's
-launcher and uses `usr/lib/gio/modules`, the GTK plugin's current layout, to
-isolate bundled GLib from newer host GIO modules.
+A compilação exclui `libwayland-*.so*` por meio de `LINUXDEPLOY_EXCLUDED_LIBRARIES`
+para que o Mesa use as bibliotecas Wayland correspondentes do host. O Tauri CLI 2.12.1
+também fornece o linuxdeploy e o plugin GTK atualizados. O AppRun do projeto delega
+ao launcher do Tauri e usa `usr/lib/gio/modules`, o layout atual do plugin GTK, para
+isolar o GLib empacotado dos módulos GIO mais recentes do host.
 
-`scripts/test-linux-bundle.py` exercises library rejection and launcher behavior
-before packaging. `scripts/check-linux-bundle.py` inspects the final DEB and
-AppImage for architecture, glibc requirements, launcher permissions and content,
-the GIO TLS module and cache, and any remaining Wayland libraries or symlinks.
-Both checks run through the build script.
+`scripts/test-linux-bundle.py` exercita a rejeição de bibliotecas e o comportamento
+do launcher antes do empacotamento. `scripts/check-linux-bundle.py` inspeciona o DEB e
+o AppImage finais quanto à arquitetura, requisitos de glibc, permissões e conteúdo do
+launcher, ao módulo e cache de TLS do GIO, e a quaisquer bibliotecas ou symlinks
+Wayland remanescentes. Ambas as verificações são executadas pelo script de compilação.
 
-Validate the resulting AppImage on Ubuntu 22.04 and a newer Mesa/Wayland system.
-Confirm the interface renders, WebKit processes remain alive, and HTTPS works.
-Building and checking ELF dependencies alone does not verify those runtime paths.
+Valide o AppImage resultante no Ubuntu 22.04 e em um sistema Mesa/Wayland mais recente.
+Confirme que a interface é renderizada, que os processos do WebKit permanecem ativos e
+que o HTTPS funciona. Apenas compilar e verificar as dependências ELF não valida esses
+caminhos em tempo de execução.

@@ -1,65 +1,65 @@
-# Rust and Tauri Guidelines
+# Diretrizes de Rust e Tauri
 
-This file applies only to `src-tauri/` and inherits the repository-wide rules in [`../AGENTS.md`](../AGENTS.md).
+Este arquivo se aplica apenas a `src-tauri/` e herda as regras gerais do repositório em [`../AGENTS.md`](../AGENTS.md).
 
-## Workspace boundaries
+## Limites do workspace
 
-- `crates/mangodisk-core`: platform-neutral product domains, use cases, safety policy, persistence, and reporting. It must not depend on Tauri or a WebView.
-- `crates/mangodisk-platform`: OS contracts and macOS/Windows implementations. It reports typed capabilities and safe fallbacks; it does not decide product workflows.
-- `src/`: thin Tauri adapter. Commands validate transport input, call Core, translate typed errors, and publish events.
-- `plugins/`: isolated Tauri plugin integration only when a capability genuinely needs a plugin.
-- A formal CLI is a separate console binary over Core. Engineering-only maintenance commands belong in `xtask`, not in the GUI binary or public CLI.
+- `crates/mangodisk-core`: domínios de produto neutros quanto à plataforma, casos de uso, política de segurança, persistência e relatórios. Não deve depender do Tauri nem de uma WebView.
+- `crates/mangodisk-platform`: contratos do sistema operacional e implementações para macOS/Windows. Reporta capacidades tipadas e fallbacks seguros; não decide fluxos do produto.
+- `src/`: adaptador Tauri fino. Os comandos validam a entrada de transporte, chamam o Core, traduzem erros tipados e publicam eventos.
+- `plugins/`: integração isolada de plugins Tauri apenas quando uma capacidade realmente precisa de um plugin.
+- Uma CLI formal é um binário de console separado sobre o Core. Comandos de manutenção exclusivamente de engenharia pertencem ao `xtask`, não ao binário da GUI nem à CLI pública.
 
-Core is organized around `cleanup`, `storage`, `applications`, `filesystem`, `history`, and `reporting`. `storage::analysis`, `storage::large_files`, and `storage::duplicates` remain separate implementations and must not become a new giant `StorageService`.
+O Core é organizado em torno de `cleanup`, `storage`, `applications`, `filesystem`, `history` e `reporting`. `storage::analysis`, `storage::large_files` e `storage::duplicates` permanecem como implementações separadas e não devem se tornar um novo `StorageService` gigante.
 
-## Rust organization and naming
+## Organização e nomenclatura do Rust
 
-- Files and modules use `snake_case`; types use precise domain nouns; functions use verbs that state observable behavior.
-- `duplicates` names the domain. `duplicate_files` is valid only for a file-specific entity, use case, adapter command, or wire event.
-- Avoid `utils` for domain behavior. Put a helper beside its owner or in a narrowly named infrastructure module.
-- Keep visibility minimal. A new `pub` or `pub(crate)` API must represent a stable collaboration boundary, not an expedient way around module ownership.
-- Prefer small typed request/result structures over long parameter lists and unrelated tuples.
-- Keep use-case orchestration in `service.rs`; put domain policy, fingerprinting, mutation, and execution-history responsibilities in narrowly named private modules. Extend an existing owner, such as uninstall `batch`, before creating another helper module. Keep service regression tests in adjacent `service_tests.rs` files when they would obscure production flow.
-- Source comments, logs, errors, tests, and assertions must be clear and consistent. Explain safety assumptions, ownership, performance tradeoffs, and fallback reasons.
+- Arquivos e módulos usam `snake_case`; tipos usam substantivos precisos de domínio; funções usam verbos que declaram comportamento observável.
+- `duplicates` nomeia o domínio. `duplicate_files` é válido apenas para uma entidade, caso de uso, comando de adaptador ou evento de transporte específico de arquivo.
+- Evite `utils` para comportamento de domínio. Coloque um auxiliar junto ao seu responsável ou em um módulo de infraestrutura com nome específico.
+- Mantenha a visibilidade mínima. Uma nova API `pub` ou `pub(crate)` deve representar um limite estável de colaboração, não um atalho para contornar a propriedade de módulos.
+- Prefira estruturas pequenas e tipadas de requisição/resultado a listas longas de parâmetros e tuplas não relacionadas.
+- Mantenha a orquestração de casos de uso em `service.rs`; coloque política de domínio, fingerprinting, mutação e histórico de execução em módulos privados com nomes específicos. Estenda um responsável existente, como o `batch` de uninstall, antes de criar outro módulo auxiliar. Mantenha testes de regressão do serviço em arquivos `service_tests.rs` adjacentes quando eles obscureceriam o fluxo de produção.
+- Comentários de código, logs, erros, testes e asserções devem ser claros e consistentes. Explique suposições de segurança, propriedade, compensações de desempenho e motivos de fallbacks.
 
-## Errors, logs, and protocols
+## Erros, logs e protocolos
 
-- Domain and platform code return typed errors or stable error codes. Convert to Tauri transport errors only in the adapter.
-- Logs use the centralized Rust logging entry point and stable domain/event/field names. Log operation IDs, useful object names/paths, counts, timings, fallback reasons, and readable native errors/codes. Use `mangodisk_platform::diagnostics::text` for bounded, escaped diagnostic fields. Never substitute a hash for the only failure explanation; exclude credentials and file contents at the source.
-- Persisted and cross-process structures require an explicit schema version and a documented read, migrate, rebuild, or reject policy.
-- Derived indexes may be rebuilt on incompatible versions. User history and settings require backward-compatible readers or an explicit migration.
-- Keep command names and event payloads versionable. Do not retain permanent old/new aliases after a migration window.
+- Código de domínio e de plataforma retorna erros tipados ou códigos de erro estáveis. Converta para erros de transporte do Tauri apenas no adaptador.
+- Os logs usam o ponto de entrada centralizado de logging do Rust e nomes estáveis de domínio/evento/campo. Registre IDs de operação, nomes/caminhos úteis de objetos, contagens, tempos, motivos de fallback e erros/códigos nativos legíveis. Use `mangodisk_platform::diagnostics::text` para campos de diagnóstico limitados e escapados. Nunca substitua um hash pela única explicação de falha; exclua credenciais e conteúdos de arquivos na origem.
+- Estruturas persistidas e entre processos exigem uma versão explícita de schema e uma política documentada de leitura, migração, reconstrução ou rejeição.
+- Índices derivados podem ser reconstruídos em versões incompatíveis. Histórico e configurações do usuário exigem leitores compatíveis com versões anteriores ou uma migração explícita.
+- Mantenha nomes de comandos e cargas de eventos versionáveis. Não retenha aliases antigos/novos permanentes após a janela de migração.
 
-## Rules and cleanup safety
+## Regras e segurança da limpeza
 
-- Declarative filesystem rules live under `crates/mangodisk-core/rules/filesystem`; project artifact rules live under `crates/mangodisk-core/rules/project-artifacts`.
-- Contributors should add validated TOML for ordinary cleanup coverage without editing Rust match branches.
-- Rule resources expose stable machine data only. UI localization belongs to frontend locale files.
-- A specialized cleaner is justified only for a system command, application API, structured package, or safety verification that TOML cannot express.
-- All destructive flows preserve preview/dry-run, protected-path validation, link/reparse-point policy, preflight, explicit user intent, execution verification, and cache synchronization.
-- Missing permission, unavailable tools, unsupported change tracking, and platform uncertainty must fail closed or use a documented slower safe path.
+- Regras declarativas de sistema de arquivos ficam em `crates/mangodisk-core/rules/filesystem`; regras de artefatos de projeto ficam em `crates/mangodisk-core/rules/project-artifacts`.
+- Colaboradores devem adicionar TOML validado para cobertura comum de limpeza sem editar ramificações `match` em Rust.
+- Recursos de regras expõem apenas dados estáveis de máquina. A localização da interface pertence aos arquivos de locale do frontend.
+- Um limpador especializado se justifica apenas para um comando do sistema, API de aplicativo, pacote estruturado ou verificação de segurança que o TOML não consegue expressar.
+- Todos os fluxos destrutivos preservam prévia/simulação (dry-run), validação de caminhos protegidos, política de links/pontos de novo parse, pré-verificação, intenção explícita do usuário, verificação da execução e sincronização de cache.
+- Permissão ausente, ferramentas indisponíveis, rastreamento de alterações sem suporte e incerteza de plataforma devem falhar de forma segura (fail closed) ou usar um caminho seguro mais lento e documentado.
 
-Read [`crates/mangodisk-core/rules/README.md`](crates/mangodisk-core/rules/README.md) before changing cleanup rules or their filesystem schema.
+Leia [`crates/mangodisk-core/rules/README.md`](crates/mangodisk-core/rules/README.md) antes de alterar regras de limpeza ou seu schema de sistema de arquivos.
 
-## Platform code
+## Código de plataforma
 
-- Define the contract before moving an implementation. Platform facts must not import cleanup or UI concepts.
-- Keep `cfg` at narrow module or item boundaries. A platform-only field, import, or accessor must be conditionally compiled rather than silenced with dead-code allowances.
-- Native fast paths require a correct fallback and diagnostics that distinguish fast, cached, incremental, and full traversal behavior.
-- Tests that cannot run on the current OS may use explicit `cfg`; do not make a platform test pass by replacing its behavior with a mock in production code.
-- Privileged operations require a separately reviewed capability boundary. Do not expand Tauri permissions or simulate a privileged helper inside an ordinary cleaner.
+- Defina o contrato antes de mover uma implementação. Fatos de plataforma não devem importar conceitos de limpeza ou de interface.
+- Mantenha `cfg` em limites estreitos de módulo ou item. Um campo, import ou acessador exclusivo de plataforma deve ser compilado condicionalmente, e não silenciado com atributos de código morto.
+- Caminhos rápidos nativos exigem um fallback correto e diagnósticos que distingam comportamento de travessia rápida, em cache, incremental e completa.
+- Testes que não podem rodar no sistema operacional atual podem usar `cfg` explícito; não faça um teste de plataforma passar substituindo seu comportamento por um mock no código de produção.
+- Operações privilegiadas exigem um limite de capacidade revisado separadamente. Não amplie permissões do Tauri nem simule um helper privilegiado dentro de um limpador comum.
 
-## Tauri adapter and plugins
+## Adaptador Tauri e plugins
 
-- Command handlers remain async adapters and contain no scan, cleanup, or persistence algorithms.
-- Register every command, permission, capability, frontend binding, and plugin initialization in the same change.
-- Generated plugin or Specta bindings are generated artifacts; regenerate them through their source tool instead of editing them by hand.
-- Keep capability scopes minimal and platform-specific where appropriate.
-- App startup must not perform long scans or blocking filesystem work before the first window is rendered.
+- Manipuladores de comando permanecem como adaptadores assíncronos e não contêm algoritmos de varredura, limpeza ou persistência.
+- Registre cada comando, permissão, capacidade, binding de frontend e inicialização de plugin na mesma alteração.
+- Bindings gerados de plugin ou Specta são artefatos gerados; regenere-os pela ferramenta de origem em vez de editá-los manualmente.
+- Mantenha escopos de capacidade mínimos e específicos por plataforma quando apropriado.
+- A inicialização do app não deve realizar varreduras longas nem trabalho de sistema de arquivos bloqueante antes da primeira janela ser renderizada.
 
-## Validation
+## Validação
 
-For Rust changes, run:
+Para alterações em Rust, execute:
 
 ```sh
 pnpm rust:fmt:check
@@ -69,4 +69,4 @@ pnpm rust:test:desktop
 cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core
 ```
 
-Run `pnpm check` before submitting or merging a change. Cross-platform changes must run applicable checks in macOS and Windows environments. If a platform is unavailable, document the unvalidated scope. Changes to rules, scan engines, indexes, persistence, native fast paths, or performance require tests or a reproducible measurement appropriate to the affected behavior; keep raw machine evidence and private datasets outside the repository.
+Execute `pnpm check` antes de enviar ou mesclar uma alteração. Alterações multiplataforma devem executar as verificações aplicáveis em ambientes macOS e Windows. Se uma plataforma não estiver disponível, documente o escopo não validado. Alterações em regras, motores de varredura, índices, persistência, caminhos rápidos nativos ou desempenho exigem testes ou uma medição reproduzível apropriada ao comportamento afetado; mantenha evidências brutas da máquina e conjuntos de dados privados fora do repositório.

@@ -1,11 +1,25 @@
 <h1 align="center">
-  <img src="public/mangodisk.svg" width="40" alt="MangoDisk application icon"> MangoDisk
+  <img src="public/mangodisk.svg" width="40" alt="ícone do aplicativo MangoDisk"> MangoDisk
 </h1>
 
-<p align="center">Disk cleanup, storage analysis, and privacy protection for <b>macOS</b>, <b>Windows</b>, and <b>Linux</b></p>
+<p align="center">Limpeza de disco, análise de armazenamento e proteção de privacidade para <b>macOS</b>, <b>Windows</b> e <b>Linux</b></p>
+
+<p align="center"><b>Pix:</b> pixgg</p>
+
+## Índice
+
+- [O que o MangoDisk pode fazer](#o-que-o-mangodisk-pode-fazer)
+- [Segurança e regras](#segurança-e-regras)
+- [Capturas de tela](#capturas-de-tela)
+- [Antes de começar](#antes-de-começar)
+- [Aplicativo de desktop](#aplicativo-de-desktop)
+- [Linha de comando (CLI)](#linha-de-comando-cli)
+- [Compilar a partir do código-fonte](#compilar-a-partir-do-código-fonte)
+- [Contribuindo](#contribuindo)
+- [Licença](#licença)
 
 <p align="center">
-  English Â· <a href="README.zh-CN.md">ç®€ä½“ä¸­æ–‡</a> Â· <a href="README.zh-TW.md">ç¹é«”ä¸­æ–‡</a> Â· <a href="README.ja.md">æ—¥æœ¬èªž</a> Â· <a href="README.ko.md">í•œêµ­ì–´</a> Â· <a href="README.ru.md">Ð ÑƒÑÑÐºÐ¸Ð¹</a>
+  <a href="README.pt-BR.md">Português (Brasil)</a> · <a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">繁體中文</a> · <a href="README.ja.md">日本語</a> · <a href="README.ko.md">한국어</a> · <a href="README.ru.md">Русский</a>
 </p>
 
 <p align="center">
@@ -20,179 +34,179 @@
 <p align="center">
   <a href="https://ramonmods.github.io/MangoDisk/">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-00-overview.jpg?ver=2.1.1">
-      <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-00-overview.jpg?ver=2.1.1">
-      <img src="public/screenshots/en/light-00-overview.jpg?ver=2.1.1" width="1200" alt="MangoDisk Overview dashboard">
+      <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-00-overview.jpg?ver=2.1.1">
+      <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-00-overview.jpg?ver=2.1.1">
+      <img src="public/screenshots/pt/light-00-overview.jpg?ver=2.1.1" width="1200" alt="painel de visão geral do MangoDisk">
     </picture>
   </a>
 </p>
 
-## What MangoDisk Can Do
+## O que o MangoDisk pode fazer
 
-> **Storage**
+> **Armazenamento**
 
-### 1. Deep Cleanup
+### 1. Limpeza profunda
 
-Recover storage used by everyday apps, development work, and AI tools. Find caches, build artifacts, and local models in one place, without hunting through hidden folders:
+Recupere o espaço usado por aplicativos do dia a dia, trabalhos de desenvolvimento e ferramentas de IA. Encontre caches, artefatos de build e modelos locais em um só lugar, sem precisar procurar em pastas ocultas:
 
-- **System and user caches**: Reclaim space taken up over time by system temporary files, diagnostic data, and rebuildable caches.
-- **Application caches**: Keep application caches, logs, update packages, and temporary content from quietly consuming more and more storage.
-- **Browser data**: Reclaim space used by cached and temporary web data from Chrome, Edge, Firefox, Brave, Arc, Opera, and other browsers.
-- **Developer tools and Xcode**: Quickly recover substantial storage used by package managers, IDEs, compiler caches, and Xcode development data.
-- **Container caches**: Free up space used by inactive build caches and rebuildable data from Docker and other container tools.
-- **Project build artifacts**: Recover space used by rebuildable dependencies, caches, and build directories across Node.js, Rust, Gradle, Swift, Python, .NET, Godot, CMake, and other projects.
-- **AI tools**: Reclaim space taken up by caches, old logs, and temporary downloads from tools such as ChatGPT, Codex, and Claude, without tracking down each tool's data folders.
-- **AI models**: See how much space local models from Ollama, LM Studio, Hugging Face, and ComfyUI use, and remove those you no longer need to make room for new models and everyday files. Models are selected manually and must be downloaded again if needed later.
-- **Application optimization**: Shrink supported applications without affecting normal use, leaving more room on your disk.
+- **Caches do sistema e do usuário**: recupere o espaço ocupado ao longo do tempo por arquivos temporários do sistema, dados de diagnóstico e caches que podem ser recriados.
+- **Caches de aplicativos**: impeça que caches de aplicativos, logs, pacotes de atualização e conteúdos temporários consumam cada vez mais espaço silenciosamente.
+- **Dados de navegador**: recupere o espaço usado por dados web em cache e temporários do Chrome, Edge, Firefox, Brave, Arc, Opera e outros navegadores.
+- **Ferramentas de desenvolvedor e Xcode**: recupere rapidamente espaço significativo usado por gerenciadores de pacotes, IDEs, caches de compilador e dados de desenvolvimento do Xcode.
+- **Caches de contêineres**: libere espaço usado por caches de build inativos e dados recriáveis do Docker e de outras ferramentas de contêiner.
+- **Artefatos de build de projetos**: recupere espaço usado por dependências, caches e diretórios de build que podem ser recriados em projetos Node.js, Rust, Gradle, Swift, Python, .NET, Godot, CMake e outros.
+- **Ferramentas de IA**: recupere o espaço ocupado por caches, logs antigos e downloads temporários de ferramentas como ChatGPT, Codex e Claude, sem precisar localizar as pastas de dados de cada uma.
+- **Modelos de IA**: veja quanto espaço os modelos locais do Ollama, LM Studio, Hugging Face e ComfyUI ocupam e remova os que você não precisa mais para abrir espaço para novos modelos e arquivos do dia a dia. Os modelos são selecionados manualmente e precisam ser baixados novamente se forem necessários depois.
+- **Otimização de aplicativos**: reduza o tamanho de aplicativos compatíveis sem afetar o uso normal, deixando mais espaço no disco.
 
-Smart recommendations help you make safe choices quickly. You can also review items individually and see the estimated reclaimable space upfront, keeping every cleanup predictable and under your control.
+Recomendações inteligentes ajudam você a fazer escolhas seguras rapidamente. Você também pode revisar cada item individualmente e ver antecipadamente o espaço estimado que pode ser recuperado, mantendo cada limpeza previsível e sob seu controle.
 
-### 2. Large File Cleanup
+### 2. Limpeza de arquivos grandes
 
-Quickly find the largest files and reclaim space used by old installers, videos, archives, and other bulky content without digging through folders one by one.
+Encontre rapidamente os maiores arquivos e recupere o espaço usado por instaladores antigos, vídeos, arquivos compactados e outros conteúdos volumosos sem precisar navegar pasta por pasta.
 
-### 3. Duplicate File Cleanup
+### 3. Limpeza de arquivos duplicados
 
-Reclaim space taken up by duplicate copies without treating files as duplicates just because they share a name. Smart selection keeps at least one file in every group, so cleanup stays effortless and safe.
+Recupere o espaço ocupado por cópias duplicadas sem tratar arquivos como duplicados apenas por terem o mesmo nome. A seleção inteligente mantém pelo menos um arquivo em cada grupo, deixando a limpeza simples e segura.
 
-### 4. Disk Space Analysis
+### 4. Análise de espaço em disco
 
-#### Space Distribution
+#### Distribuição de espaço
 
-See where your disk space is going at a glance. Switch between a **treemap** and a **sunburst chart**, and choose how many levels to display to explore space usage and folder structure. Browse folders alongside the file list to quickly find the largest folders and files and decide what to clean up.
+Veja para onde vai o espaço do seu disco de relance. Alterne entre um **treemap** (mapa de árvore) e um **sunburst chart** (gráfico de raios solares), e escolha quantos níveis exibir para explorar o uso de espaço e a estrutura de pastas. Navegue pelas pastas junto à lista de arquivos para encontrar rapidamente as maiores pastas e arquivos e decidir o que limpar.
 
-#### Space Changes
+#### Alterações de espaço
 
-Disk space suddenly running low? Turn on scan history and compare two scans of the same drive or folder to see which files and folders grew or shrank, and by how much. Scan again after cleanup to see where you freed up space.
+O espaço do disco acabou de repente? Ative o histórico de varredura e compare duas varreduras da mesma unidade ou pasta para ver quais arquivos e pastas cresceram ou diminuíram, e quanto. Faça outra varredura após a limpeza para ver onde você liberou espaço.
 
-> **Privacy & Security**
+> **Privacidade e segurança**
 
-### 5. Privacy Cleanup
+### 5. Limpeza de privacidade
 
-Keep browsing history, searches, cookies, recent items, and clipboard data from lingering on your computer. Clear traces left by browsers, applications, and the system to reduce exposure of your activity and make everyday privacy easier to manage.
+Evite que histórico de navegação, pesquisas, cookies, itens recentes e dados da área de transferência permaneçam no seu computador. Limpe os rastros deixados por navegadores, aplicativos e pelo sistema para reduzir a exposição da sua atividade e facilitar a gestão da privacidade no dia a dia.
 
-> **System Tools**
+> **Ferramentas do sistema**
 
-### 6. Application Uninstall and Cleanup
+### 6. Desinstalação e limpeza de aplicativos
 
-Uninstall applications and clear related caches, settings, and leftovers so removing an application actually gives you the space back. Potential personal files are handled cautiously to reduce the risk of accidental deletion.
+Desinstale aplicativos e limpe caches, configurações e resíduos relacionados para que remover um aplicativo realmente devolva o espaço. Possíveis arquivos pessoais são tratados com cautela para reduzir o risco de exclusão acidental.
 
-### 7. Startup Item Management
+### 7. Gerenciamento de itens de inicialização
 
-Reduce unnecessary startup delays and background resource use, so your computer starts faster and feels lighter. Turn items back on at any time when you need them again.
+Reduza atrasos desnecessários na inicialização e o uso de recursos em segundo plano, para que seu computador inicie mais rápido e pareça mais leve. Reative os itens a qualquer momento quando precisar deles novamente.
 
-### 8. System Optimization
+### 8. Otimização do sistema
 
-Reduce unnecessary settings that slow down your system or get in the way. Balance performance, privacy, and personal preferences so your computer feels faster and easier to use.
+Reduza configurações desnecessárias que deixam o sistema lento ou atrapalham. Equilibre desempenho, privacidade e preferências pessoais para que seu computador pareça mais rápido e mais fácil de usar.
 
-### 9. System Maintenance
+### 9. Manutenção do sistema
 
-Fix common problems like missing search results, incorrect icons, no sound, or network connection failuresâ€”without hunting down fixes or typing complex commands. Get your computer back to normal sooner.
+Corrija problemas comuns como resultados de pesquisa ausentes, ícones incorretos, sem som ou falhas de conexão de rede — sem precisar procurar soluções ou digitar comandos complexos. Volte a ter seu computador funcionando normalmente mais rápido.
 
-### 10. Context Menus (Windows)
+### 10. Menus de contexto (Windows)
 
-> Available since version 1.2.3
+> Disponível desde a versão 1.2.3
 
-Keep right-click menus tidy and easy to use. Browse entries by menu location or app, disable, restore or remove supported items, and adjust menus for individual file types.
+Mantenha os menus de clique direito organizados e fáceis de usar. Navegue pelas entradas por local do menu ou aplicativo, desative, restaure ou remova itens compatíveis e ajuste os menus para tipos de arquivo específicos.
 
-Add everyday actions such as copying paths and opening a terminal, along with shortcuts to system tools.
+Adicione ações do dia a dia, como copiar caminhos e abrir um terminal, além de atalhos para ferramentas do sistema.
 
-> **Activity**
+> **Atividade**
 
-### 11. Operation History
+### 11. Histórico de operações
 
-Keep a clear record of every cleanup and system change. See how much space you recovered, what completed successfully, and whether anything still needs your attention.
+Mantenha um registro claro de cada limpeza e alteração no sistema. Veja quanto espaço você recuperou, o que foi concluído com sucesso e se algo ainda precisa da sua atenção.
 
-## Resource Usage and Memory Management
+## Uso de recursos e gerenciamento de memória
 
-> Available since version 1.1.1
+> Disponível desde a versão 1.1.1
 
-Track CPU, GPU, memory, network speeds and disk activity in real time, with trends to help you understand resource use. On supported devices, you can also check temperatures, power usage, battery status and disk health.
+Acompanhe CPU, GPU, memória, velocidades de rede e atividade do disco em tempo real, com tendências para ajudar você a entender o uso de recursos. Em dispositivos compatíveis, você também pode verificar temperaturas, consumo de energia, estado da bateria e saúde do disco.
 
-Quickly find resource-heavy apps, quit those you no longer need, and free memory manually or automatically.
+Encontre rapidamente aplicativos que consomem muitos recursos, encerre os que você não precisa mais e libere memória manual ou automaticamente.
 
-Display metrics in the menu bar, taskbar, system tray or a floating desktop window. Customize the content and appearance to keep an eye on your computer without opening the main window.
+Exiba métricas na barra de menus, na barra de tarefas, na bandeja do sistema ou em uma janela flutuante na área de trabalho. Personalize o conteúdo e a aparência para acompanhar seu computador sem abrir a janela principal.
 
-## AI Explanations
+## Explicações de IA
 
-> Available since version 1.1.0
+> Disponível desde a versão 1.1.0
 
-Unsure what an item does or what might happen if you change it? AI explanations use the item's description and current scan results to explain its purpose and what to consider before taking action. Spend less time looking things up and make more informed choices.
+Não tem certeza do que um item faz ou do que pode acontecer se você alterá-lo? As explicações de IA usam a descrição do item e os resultados da varredura atual para explicar sua função e o que considerar antes de agir. Passe menos tempo pesquisando e tome decisões mais bem informadas.
 
-Get explanations directly from items in Deep Cleanup (built-in rules), Privacy Cleanup, Startup Item Management, System Optimization, and System Maintenance.
+Obtenha explicações diretamente dos itens em Limpeza profunda (regras integradas), Limpeza de privacidade, Gerenciamento de itens de inicialização, Otimização do sistema e Manutenção do sistema.
 
-Official releases include free explanations each day, with the option to connect your own AI service. AI offers guidance; you decide which actions to take.
+As versões oficiais incluem explicações gratuitas a cada dia, com a opção de conectar seu próprio serviço de IA. A IA oferece orientações; você decide quais ações tomar.
 
-## Safety and Rules
+## Segurança e regras
 
 > [!IMPORTANT]
-> **MangoDisk puts data safety ahead of reclaiming more space.**
-> Cleanup rules and system optimizations only ship after their safety boundaries are clearly defined and they pass validation on real systems.
+> **O MangoDisk prioriza a segurança dos dados em vez de recuperar mais espaço.**
+> Regras de limpeza e otimizações do sistema só são lançadas depois que seus limites de segurança são claramente definidos e passam por validação em sistemas reais.
 
-MangoDisk scans in read-only mode by default. Before cleanup, deletion, uninstall, or system setting changes begin, you can review and confirm exactly what will happen. Results are saved to Operation History.
+O MangoDisk faz varreduras em modo somente leitura por padrão. Antes de iniciar limpeza, exclusão, desinstalação ou alterações de configuração do sistema, você pode revisar e confirmar exatamente o que acontecerá. Os resultados são salvos no Histórico de operações.
 
-System Optimization only uses built-in, validated settings. It never accepts arbitrary registry paths, terminal commands, or scripts. MangoDisk reads each setting again after changing it and calls out high-impact items and changes that require administrator access or a restart.
+A Otimização do sistema usa apenas configurações integradas e validadas. Nunca aceita caminhos de registro arbitrários, comandos de terminal ou scripts. O MangoDisk lê cada configuração novamente após alterá-la e destaca itens de alto impacto e mudanças que exigem acesso de administrador ou reinicialização.
 
-MangoDisk maintains its own cleanup rules. Third-party projects may provide research leads, but a candidate rule is only accepted after reliable sources, safe boundaries, and real-system behavior have been verified. Anything without a clear safety boundary is excluded.
+O MangoDisk mantém suas próprias regras de limpeza. Projetos de terceiros podem fornecer pistas para pesquisa, mas uma regra candidata só é aceita após a verificação de fontes confiáveis, limites seguros e comportamento em sistemas reais. Qualquer coisa sem um limite de segurança claro é excluída.
 
-The complete rule library and revision history are open for inspection: [view the MangoDisk cleanup rule library](https://github.com/RamonMods/MangoDisk/tree/main/src-tauri/crates/mangodisk-core/rules).
+A biblioteca completa de regras e o histórico de revisões estão abertos para inspeção: [veja a biblioteca de regras de limpeza do MangoDisk](https://github.com/RamonMods/MangoDisk/tree/main/src-tauri/crates/mangodisk-core/rules).
 
-## Screenshots
+## Capturas de tela
 
 <p align="center">
-  <strong>Deep Cleanup</strong><br>
-  <sub>Make room for what matters by clearing accumulated caches, build artifacts, and AI models you no longer need</sub>
+  <strong>Limpeza profunda</strong><br>
+  <sub>Abra espaço para o que importa limpando caches acumulados, artefatos de build e modelos de IA que você não precisa mais</sub>
 </p>
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-01-deep-cleanup.jpg?ver=2.1.1">
-    <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-01-deep-cleanup.jpg?ver=2.1.1">
-    <img src="public/screenshots/en/light-01-deep-cleanup.jpg?ver=2.1.1" width="1200" alt="MangoDisk Deep Cleanup interface">
+    <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-01-deep-cleanup.jpg?ver=2.1.1">
+    <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-01-deep-cleanup.jpg?ver=2.1.1">
+    <img src="public/screenshots/pt/light-01-deep-cleanup.jpg?ver=2.1.1" width="1200" alt="interface de Limpeza profunda do MangoDisk">
   </picture>
 </p>
 
 <p align="center">
-  <strong>Space Distribution</strong><br>
-  <sub>See where your storage is going and quickly find the largest files and folders</sub>
+  <strong>Distribuição de espaço</strong><br>
+  <sub>Veja para onde vai seu armazenamento e encontre rapidamente os maiores arquivos e pastas</sub>
 </p>
 
 <p align="center">
-  <a href="public/screenshots/en/light-05-disk-space-analysis.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+  <a href="public/screenshots/pt/light-05-disk-space-analysis.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-05-disk-space-analysis.jpg?ver=2.1.1">
-      <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-05-disk-space-analysis.jpg?ver=2.1.1">
-      <img src="public/screenshots/en/light-05-disk-space-analysis.jpg?ver=2.1.1" width="1200" alt="MangoDisk Disk Space Analysis interface">
+      <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-05-disk-space-analysis.jpg?ver=2.1.1">
+      <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-05-disk-space-analysis.jpg?ver=2.1.1">
+      <img src="public/screenshots/pt/light-05-disk-space-analysis.jpg?ver=2.1.1" width="1200" alt="interface de Análise de espaço em disco do MangoDisk">
     </picture>
   </a>
 </p>
 
 <p align="center">
-  <strong>Space Changes</strong><br>
-  <sub>Compare two scans to see which files and folders take up more or less space</sub>
+  <strong>Alterações de espaço</strong><br>
+  <sub>Compare duas varreduras para ver quais arquivos e pastas ocupam mais ou menos espaço</sub>
 </p>
 
 <p align="center">
-  <a href="public/screenshots/en/light-05-disk-space-analysis-space-changes.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+  <a href="public/screenshots/pt/light-05-disk-space-analysis-space-changes.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-05-disk-space-analysis-space-changes.jpg?ver=2.1.1">
-      <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-05-disk-space-analysis-space-changes.jpg?ver=2.1.1">
-      <img src="public/screenshots/en/light-05-disk-space-analysis-space-changes.jpg?ver=2.1.1" width="1200" alt="MangoDisk Space Changes view comparing two scans">
+      <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-05-disk-space-analysis-space-changes.jpg?ver=2.1.1">
+      <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-05-disk-space-analysis-space-changes.jpg?ver=2.1.1">
+      <img src="public/screenshots/pt/light-05-disk-space-analysis-space-changes.jpg?ver=2.1.1" width="1200" alt="visualização de Alterações de espaço do MangoDisk comparando duas varreduras">
     </picture>
   </a>
 </p>
 
 <p align="center">
-  <strong>System Monitoring</strong><br>
-  <sub>CPU, memory, network, and disk activity at a glance</sub>
+  <strong>Monitoramento do sistema</strong><br>
+  <sub>CPU, memória, rede e atividade do disco de relance</sub>
 </p>
 
 <p align="center">
-  <a href="public/screenshots/en/light-system-monitoring-memory.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+  <a href="public/screenshots/pt/light-system-monitoring-memory.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-system-monitoring-memory.jpg?ver=2.1.1">
-      <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-system-monitoring-memory.jpg?ver=2.1.1">
-      <img src="public/screenshots/en/light-system-monitoring-memory.jpg?ver=2.1.1" width="720" alt="MangoDisk system monitoring and memory management">
+      <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-system-monitoring-memory.jpg?ver=2.1.1">
+      <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-system-monitoring-memory.jpg?ver=2.1.1">
+      <img src="public/screenshots/pt/light-system-monitoring-memory.jpg?ver=2.1.1" width="720" alt="monitoramento do sistema e gerenciamento de memória do MangoDisk">
     </picture>
   </a>
 </p>
@@ -200,163 +214,163 @@ The complete rule library and revision history are open for inspection: [view th
 <table>
   <tr>
     <td width="50%" align="center">
-      <strong>Large File Cleanup</strong><br>
-      <sub>Find the files taking up the most space without digging through folders</sub><br><br>
-      <a href="public/screenshots/en/light-02-large-file-cleanup.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+      <strong>Limpeza de arquivos grandes</strong><br>
+      <sub>Encontre os arquivos que ocupam mais espaço sem precisar navegar pelas pastas</sub><br><br>
+      <a href="public/screenshots/pt/light-02-large-file-cleanup.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
         <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-02-large-file-cleanup.jpg?ver=2.1.1">
-          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-02-large-file-cleanup.jpg?ver=2.1.1">
-          <img src="public/screenshots/en/light-02-large-file-cleanup.jpg?ver=2.1.1" width="100%" alt="MangoDisk Large File Cleanup interface">
+          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-02-large-file-cleanup.jpg?ver=2.1.1">
+          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-02-large-file-cleanup.jpg?ver=2.1.1">
+          <img src="public/screenshots/pt/light-02-large-file-cleanup.jpg?ver=2.1.1" width="100%" alt="interface de Limpeza de arquivos grandes do MangoDisk">
         </picture>
       </a>
     </td>
     <td width="50%" align="center">
-      <strong>Duplicate File Cleanup</strong><br>
-      <sub>Safely remove exact duplicates while keeping at least one copy</sub><br><br>
-      <a href="public/screenshots/en/light-03-duplicate-cleanup.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+      <strong>Limpeza de arquivos duplicados</strong><br>
+      <sub>Remova duplicatas exatas com segurança, mantendo pelo menos uma cópia</sub><br><br>
+      <a href="public/screenshots/pt/light-03-duplicate-cleanup.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
         <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-03-duplicate-cleanup.jpg?ver=2.1.1">
-          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-03-duplicate-cleanup.jpg?ver=2.1.1">
-          <img src="public/screenshots/en/light-03-duplicate-cleanup.jpg?ver=2.1.1" width="100%" alt="MangoDisk Duplicate File Cleanup interface">
-        </picture>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" align="center">
-      <strong>Startup Item Management</strong><br>
-      <sub>Reduce unnecessary startup programs for faster sign-in and less background activity</sub><br><br>
-      <a href="public/screenshots/en/light-06-startup-items.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-06-startup-items.jpg?ver=2.1.1">
-          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-06-startup-items.jpg?ver=2.1.1">
-          <img src="public/screenshots/en/light-06-startup-items.jpg?ver=2.1.1" width="100%" alt="MangoDisk Startup Item Management interface">
-        </picture>
-      </a>
-    </td>
-    <td width="50%" align="center">
-      <strong>Application Uninstall and Cleanup</strong><br>
-      <sub>Uninstall applications and remove related leftovers to reclaim more space</sub><br><br>
-      <a href="public/screenshots/en/light-04-app-uninstaller.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-04-app-uninstaller.jpg?ver=2.1.1">
-          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-04-app-uninstaller.jpg?ver=2.1.1">
-          <img src="public/screenshots/en/light-04-app-uninstaller.jpg?ver=2.1.1" width="100%" alt="MangoDisk Application Uninstaller interface">
+          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-03-duplicate-cleanup.jpg?ver=2.1.1">
+          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-03-duplicate-cleanup.jpg?ver=2.1.1">
+          <img src="public/screenshots/pt/light-03-duplicate-cleanup.jpg?ver=2.1.1" width="100%" alt="interface de Limpeza de arquivos duplicados do MangoDisk">
         </picture>
       </a>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <strong>System Optimization</strong><br>
-      <sub>Optimize performance, privacy, and everyday usability in one click</sub><br><br>
-      <a href="public/screenshots/en/light-07-system-optimization.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+      <strong>Gerenciamento de itens de inicialização</strong><br>
+      <sub>Reduza programas desnecessários na inicialização para entrar mais rápido e ter menos atividade em segundo plano</sub><br><br>
+      <a href="public/screenshots/pt/light-06-startup-items.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
         <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-07-system-optimization.jpg?ver=2.1.1">
-          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-07-system-optimization.jpg?ver=2.1.1">
-          <img src="public/screenshots/en/light-07-system-optimization.jpg?ver=2.1.1" width="100%" alt="MangoDisk System Optimization interface">
+          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-06-startup-items.jpg?ver=2.1.1">
+          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-06-startup-items.jpg?ver=2.1.1">
+          <img src="public/screenshots/pt/light-06-startup-items.jpg?ver=2.1.1" width="100%" alt="interface de Gerenciamento de itens de inicialização do MangoDisk">
         </picture>
       </a>
     </td>
     <td width="50%" align="center">
-      <strong>System Maintenance</strong><br>
-      <sub>Fix common system issues quickly and get your computer back to normal</sub><br><br>
-      <a href="public/screenshots/en/light-08-system-maintenance.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+      <strong>Desinstalação e limpeza de aplicativos</strong><br>
+      <sub>Desinstale aplicativos e remova resíduos relacionados para recuperar mais espaço</sub><br><br>
+      <a href="public/screenshots/pt/light-04-app-uninstaller.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
         <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-08-system-maintenance.jpg?ver=2.1.1">
-          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-08-system-maintenance.jpg?ver=2.1.1">
-          <img src="public/screenshots/en/light-08-system-maintenance.jpg?ver=2.1.1" width="100%" alt="MangoDisk System Maintenance interface">
+          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-04-app-uninstaller.jpg?ver=2.1.1">
+          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-04-app-uninstaller.jpg?ver=2.1.1">
+          <img src="public/screenshots/pt/light-04-app-uninstaller.jpg?ver=2.1.1" width="100%" alt="interface de desinstalação de aplicativos do MangoDisk">
         </picture>
       </a>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <strong>Privacy Cleanup</strong><br>
-      <sub>Leave fewer activity traces behind and keep everyday use more private</sub><br><br>
-      <a href="public/screenshots/en/light-09-privacy-cleanup.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+      <strong>Otimização do sistema</strong><br>
+      <sub>Otimize desempenho, privacidade e usabilidade do dia a dia com um clique</sub><br><br>
+      <a href="public/screenshots/pt/light-07-system-optimization.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
         <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/en/dark-09-privacy-cleanup.jpg?ver=2.1.1">
-          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/en/light-09-privacy-cleanup.jpg?ver=2.1.1">
-          <img src="public/screenshots/en/light-09-privacy-cleanup.jpg?ver=2.1.1" width="100%" alt="MangoDisk Privacy Cleanup interface">
+          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-07-system-optimization.jpg?ver=2.1.1">
+          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-07-system-optimization.jpg?ver=2.1.1">
+          <img src="public/screenshots/pt/light-07-system-optimization.jpg?ver=2.1.1" width="100%" alt="interface de Otimização do sistema do MangoDisk">
+        </picture>
+      </a>
+    </td>
+    <td width="50%" align="center">
+      <strong>Manutenção do sistema</strong><br>
+      <sub>Corrija problemas comuns do sistema rapidamente e deixe seu computador normal novamente</sub><br><br>
+      <a href="public/screenshots/pt/light-08-system-maintenance.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-08-system-maintenance.jpg?ver=2.1.1">
+          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-08-system-maintenance.jpg?ver=2.1.1">
+          <img src="public/screenshots/pt/light-08-system-maintenance.jpg?ver=2.1.1" width="100%" alt="interface de Manutenção do sistema do MangoDisk">
+        </picture>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <strong>Limpeza de privacidade</strong><br>
+      <sub>Deixe menos rastros de atividade e mantenha o uso do dia a dia mais privado</sub><br><br>
+      <a href="public/screenshots/pt/light-09-privacy-cleanup.jpg?ver=2.1.1" target="_blank" rel="noopener noreferrer">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="public/screenshots/pt/dark-09-privacy-cleanup.jpg?ver=2.1.1">
+          <source media="(prefers-color-scheme: light)" srcset="public/screenshots/pt/light-09-privacy-cleanup.jpg?ver=2.1.1">
+          <img src="public/screenshots/pt/light-09-privacy-cleanup.jpg?ver=2.1.1" width="100%" alt="interface de Limpeza de privacidade do MangoDisk">
         </picture>
       </a>
     </td>
   </tr>
 </table>
 
-## Before You Begin
+## Antes de começar
 
 > [!CAUTION]
 >
-> 1. Cleanup, permanent deletion, and uninstall operations may not be reversible. Review the selected content and keep reliable backups of important data.
-> 2. Before running system maintenance or changing a startup item or system setting, make sure you understand its purpose and impact.
-> 3. Some system optimizations can affect security, privacy, battery life, or update behavior.
+> 1. Limpeza, exclusão permanente e desinstalação podem não ser reversíveis. Revise o conteúdo selecionado e mantenha backups confiáveis de dados importantes.
+> 2. Antes de executar a manutenção do sistema ou alterar um item de inicialização ou configuração do sistema, certifique-se de entender sua finalidade e impacto.
+> 3. Algumas otimizações do sistema podem afetar segurança, privacidade, duração da bateria ou comportamento de atualizações.
 
-## Desktop App
+## Aplicativo de desktop
 
-Download MangoDisk from the [official download page](https://ramonmods.github.io/MangoDisk/download) or [GitHub Releases](https://github.com/RamonMods/MangoDisk/releases/latest), then follow the instructions for your operating system below.
+Baixe o MangoDisk na [página oficial de download](https://ramonmods.github.io/MangoDisk/download) ou nas [versões do GitHub](https://github.com/RamonMods/MangoDisk/releases/latest), e siga as instruções para seu sistema operacional abaixo.
 
 ### macOS
 
-**Requirements:** macOS Monterey 12.5 or later.
+**Requisitos:** macOS Monterey 12.5 ou superior.
 
-**Install with Homebrew:**
+**Instalar com Homebrew:**
 
 ```sh
 brew install --cask RamonMods/tap/mangodisk
 ```
 
-**Manual installation:** Download the DMG from the [official download page](https://ramonmods.github.io/MangoDisk/download), open it, and drag MangoDisk into the Applications folder.
+**Instalação manual:** baixe o DMG na [página oficial de download](https://ramonmods.github.io/MangoDisk/download), abra-o e arraste o MangoDisk para a pasta Applications.
 
 ### Windows
 
-**Requirements:** 64-bit Windows 10 or later.
+**Requisitos:** Windows 10 de 64 bits ou superior.
 
-**Install with PowerShell:**
-
-```powershell
-winget install --id MangoDisk.MangoDisk --exact --source winget
-```
-
-**Install with WinGet (official source):**
+**Instalar com PowerShell:**
 
 ```powershell
 winget install --id MangoDisk.MangoDisk --exact --source winget
 ```
 
-**Manual installation:** Download the Windows installer from the [official download page](https://ramonmods.github.io/MangoDisk/download) and follow the installation prompts.
+**Instalar com WinGet (fonte oficial):**
+
+```powershell
+winget install --id MangoDisk.MangoDisk --exact --source winget
+```
+
+**Instalação manual:** baixe o instalador para Windows na [página oficial de download](https://ramonmods.github.io/MangoDisk/download) e siga as instruções de instalação.
 
 ### Linux
 
-**Recommended:** Ubuntu 22.04 LTS or later, on x64 or ARM64.
+**Recomendado:** Ubuntu 22.04 LTS ou superior, em x64 ou ARM64.
 
-Available as `.deb` packages and AppImages. Compatibility with other Linux distributions depends on their system libraries and desktop environment.
+Disponível como pacotes `.deb` e AppImages. A compatibilidade com outras distribuições Linux depende das bibliotecas do sistema e do ambiente de desktop.
 
-**Install with Homebrew:** Requires a recent Homebrew version and a desktop environment.
+**Instalar com Homebrew:** exige uma versão recente do Homebrew e um ambiente de desktop.
 
 ```sh
 brew install --cask RamonMods/tap/mangodisk
 ```
 
-**Install from the terminal (Debian/Ubuntu):** This command detects your architecture and installs the latest matching `.deb` package.
+**Instalar pelo terminal (Debian/Ubuntu):** este comando detecta sua arquitetura e instala o pacote `.deb` mais recente compatível.
 
 ```sh
 curl -fsSL https://github.com/RamonMods/MangoDisk/releases/latest | bash
 ```
 
-**Manual installation:** Choose the package for your architecture on the [official download page](https://ramonmods.github.io/MangoDisk/download).
+**Instalação manual:** escolha o pacote para sua arquitetura na [página oficial de download](https://ramonmods.github.io/MangoDisk/download).
 
-- **Debian/Ubuntu:** Install the `.deb` package for your architecture.
-- **Other distributions:** Try the AppImage by making it executable, then running it.
+- **Debian/Ubuntu:** instale o pacote `.deb` para sua arquitetura.
+- **Outras distribuições:** experimente o AppImage tornando-o executável e depois executando-o.
 
-## Command Line (CLI)
+## Linha de comando (CLI)
 
-Use MangoDisk in your terminal or scripts, with the same safety-first cleanup engine as the desktop app.
+Use o MangoDisk no terminal ou em scripts, com o mesmo mecanismo de limpeza que prioriza a segurança do aplicativo de desktop.
 
 ### macOS
 
-**Install with Homebrew:**
+**Instalar com Homebrew:**
 
 ```sh
 brew install RamonMods/tap/mangodisk-cli
@@ -364,13 +378,13 @@ brew install RamonMods/tap/mangodisk-cli
 
 ### Windows
 
-**Install with PowerShell:**
+**Instalar com PowerShell:**
 
 ```powershell
 winget install --id MangoDisk.MangoDisk --exact --source winget
 ```
 
-**Install with WinGet (official source):**
+**Instalar com WinGet (fonte oficial):**
 
 ```powershell
 winget install --id MangoDisk.CLI --exact --source winget
@@ -378,17 +392,17 @@ winget install --id MangoDisk.CLI --exact --source winget
 
 ### Linux
 
-Prebuilt standalone CLI downloads are not yet available for Linux. Follow the [Build from Source](#build-from-source) instructions below to build it yourself.
+Ainda não há downloads de CLI autônomos pré-compilados para Linux. Siga as instruções de [compilar a partir do código-fonte](#build-from-source) abaixo para compilar você mesmo.
 
-### Usage Examples
+### Exemplos de uso
 
-If `mangodisk` is not immediately available after installation, open a new terminal, then verify the installation:
+Se `mangodisk` não estiver disponível imediatamente após a instalação, abra um novo terminal e verifique a instalação:
 
 ```sh
 mangodisk --version
 ```
 
-Common commands:
+Comandos comuns:
 
 ```sh
 # Scan and show cleanable content without changing anything
@@ -404,23 +418,25 @@ mangodisk clean --apply --selection all --dry-run
 mangodisk clean --format json --no-progress
 ```
 
-`mangodisk clean` only scans and never modifies files by default. To perform cleanup in a non-interactive environment, you must also pass `--yes` to confirm explicitly. Run the following command for all available options:
+`mangodisk clean` apenas faz varredura e nunca modifica arquivos por padrão. Para realizar a limpeza em um ambiente não interativo, você também precisa passar `--yes` para confirmar explicitamente. Execute o comando a seguir para ver todas as opções disponíveis:
 
 ```sh
 mangodisk clean --help
 ```
 
-## Build from Source
+<a id="build-from-source"></a>
 
-### Prerequisites
+## Compilar a partir do código-fonte
+
+### Pré-requisitos
 
 - Node.js 24 LTS
 - pnpm 11.13.1
-- Stable Rust
+- Rust estável
 
-For platform-specific dependencies, see the [Tauri 2 prerequisites](https://v2.tauri.app/start/prerequisites/).
+Para dependências específicas de cada plataforma, veja os [pré-requisitos do Tauri 2](https://v2.tauri.app/start/prerequisites/).
 
-### Get the Source and Run the Desktop Application
+### Obtenha o código-fonte e execute o aplicativo de desktop
 
 ```sh
 git clone https://github.com/RamonMods/MangoDisk.git
@@ -429,48 +445,48 @@ pnpm install --frozen-lockfile
 pnpm tauri:dev
 ```
 
-### Run the Required Checks
+### Execute as verificações necessárias
 
 ```sh
 pnpm check
 cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core
 ```
 
-### Build the Desktop Installer
+### Compile o instalador do aplicativo de desktop
 
 ```sh
 pnpm tauri:build
 ```
 
-### Build the CLI
+### Compile a CLI
 
 ```sh
 pnpm cli:build
 ```
 
-Local builds do not include the signing, notarization, or update metadata provided by official MangoDisk releases. Use them for local development and validation only.
+Compilações locais não incluem assinatura, notarização ou metadados de atualização fornecidos pelas versões oficiais do MangoDisk. Use-as apenas para desenvolvimento e validação local.
 
-## Contributing
+## Contribuindo
 
-Issues, cleanup rules, fixes, and new features are welcome. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`AGENTS.md`](AGENTS.md) before getting started.
+Issues, regras de limpeza, correções e novos recursos são bem-vindos. Leia [`CONTRIBUTING.md`](CONTRIBUTING.md) e [`AGENTS.md`](AGENTS.md) antes de começar.
 
-Routine cleanup coverage should use build-validated, declarative TOML rules. See [`src-tauri/crates/mangodisk-core/rules/README.md`](src-tauri/crates/mangodisk-core/rules/README.md) for the rule schema, safety constraints, and validation instructions.
+A cobertura rotineira de limpeza deve usar regras TOML declarativas validadas na compilação. Veja [`src-tauri/crates/mangodisk-core/rules/README.md`](src-tauri/crates/mangodisk-core/rules/README.md) para o esquema de regras, restrições de segurança e instruções de validação.
 
-Before submitting changes, run at least:
+Antes de enviar alterações, execute pelo menos:
 
 ```sh
 pnpm check
 cargo test --manifest-path src-tauri/Cargo.toml -p mangodisk-core
 ```
 
-Report security vulnerabilities privately through GitHub Security Advisories as described in [`SECURITY.md`](SECURITY.md). Do not open a public issue for a security vulnerability.
+Relate vulnerabilidades de segurança de forma privada por meio do GitHub Security Advisories, conforme descrito em [`SECURITY.md`](SECURITY.md). Não abra uma issue pública para uma vulnerabilidade de segurança.
 
-## Technology Stack
+## Stack tecnológica
 
-- [Tauri 2](https://tauri.app/): Desktop runtime and system integration
-- [Rust](https://www.rust-lang.org/): Scanning, filesystem access, safety validation, and cleanup execution
-- [Vue 3](https://vuejs.org/) and [TypeScript](https://www.typescriptlang.org/): Desktop user interface
+- [Tauri 2](https://tauri.app/): runtime de desktop e integração com o sistema
+- [Rust](https://www.rust-lang.org/): varredura, acesso ao sistema de arquivos, validação de segurança e execução da limpeza
+- [Vue 3](https://vuejs.org/) e [TypeScript](https://www.typescriptlang.org/): interface de usuário do aplicativo de desktop
 
-## License
+## Licença
 
-MangoDisk is open source under the [GNU General Public License v3.0](https://github.com/RamonMods/MangoDisk/blob/main/LICENSE). Third-party components remain subject to their respective licenses.
+O MangoDisk é de código aberto sob a [GNU General Public License v3.0](https://github.com/RamonMods/MangoDisk/blob/main/LICENSE). Componentes de terceiros continuam sujeitos às suas respectivas licenças.
