@@ -1,0 +1,32 @@
+[workspace]
+members = [
+  "src-tauri",
+  "src-tauri/crates/mangodisk-core",
+  "src-tauri/crates/mangodisk-cli",
+  "src-tauri/crates/mangodisk-platform",
+  "src-tauri/crates/mangodisk-privileged-protocol",
+  "src-tauri/crates/mangodisk-privileged",
+  "src-tauri/xtask",
+]
+resolver = "2"
+
+[workspace.package]
+version = "2.1.1"
+edition = "2021"
+rust-version = "1.99.0"
+authors = ["RamonMods <RamonMods@users.noreply.github.com>"]
+license = "GPL-3.0-only"
+repository = "https://github.com/RamonMods/MangoDisk"
+homepage = "https://ramonmods.github.io/MangoDisk"
+
+# Filesystem traversal and content hashing are exercised directly from the desktop development
+# build. Optimizing only these performance-critical packages keeps UI iteration responsive while
+# preserving debug assertions and avoiding release-level compilation for unrelated dependencies.
+[profile.dev.package.mangodisk-core]
+opt-level = 2
+
+[profile.dev.package.mangodisk-platform]
+opt-level = 2
+
+[profile.dev.package.blake3]
+opt-level = 3

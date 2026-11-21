@@ -1,0 +1,16 @@
+export type CommandErrorReason =
+  | 'systemManagedFile'
+  | 'resourceBusy'
+  | 'accessDeniedOrBusy'
+  | 'itemChanged'
+  | 'scanResourcesReleasing'
+  | 'quickScanUnavailable'
+  | 'folderUnavailable'
+  | 'folderSelectionLimitExceeded'
+  | 'analysisRootExcluded'
+  | 'analysisExportUnavailable'
+  | 'scanExclusionsChanged'
+  | 'preferencesConflict'
+  | 'directoryNotEmpty'
+  | 'deleteIncomplete'
+  | 'deleteRecoveryFailed';
