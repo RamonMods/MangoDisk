@@ -551,7 +551,7 @@
     "riskDialog": {
       "title": "Confirmar configurações de alto impacto",
       "description": "Essas configurações podem reduzir a segurança do sistema, recuperação ou proteção de atualização. Continue apenas se você entender o impacto",
-      "note": "O Smart recommended never seleciona essas configurações automaticamente; apenas os itens que você ativar manualmente serão aplicados",
+      "note": "O Smart nunca seleciona essas configurações automaticamente; apenas os itens que você ativar manualmente serão aplicados",
       "confirm": "Continuar assim mesmo"
     },
     "feedback": {
