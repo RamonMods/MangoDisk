@@ -101,7 +101,7 @@ describe('privacy detail dialog component', () => {
   });
 
   it('keeps the complete path in the detail label tooltip', async () => {
-    const fullPath = 'C:\\Users\\harry\\Documents\\reports\\quarterly-review.docx';
+    const fullPath = 'C:\\Users\\user\\Documents\\reports\\quarterly-review.docx';
     detailsMock.mockResolvedValue({
       schemaVersion: 1,
       scanId: 'scan-1',
