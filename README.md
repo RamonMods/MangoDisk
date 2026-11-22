@@ -4,7 +4,7 @@
 
 <p align="center">Limpeza de disco, análise de armazenamento e proteção de privacidade para <b>macOS</b>, <b>Windows</b> e <b>Linux</b></p>
 
-<a href="https://pixgg.com/ramon"><img src="https://img.shields.io/badge/Pix-pixgg.com%2Framon-32BCAD?style=for-the-badge&logo=pix&logoColor=white" alt="Apoiar o projeto" /></a>
+<p align="center"><a href="https://pixgg.com/ramon"><img src="https://img.shields.io/badge/Pix-pixgg.com%2Framon-32BCAD?style=for-the-badge&logo=pix&logoColor=white" alt="Apoiar o projeto" /></a></p>
 
 ## Índice
 
