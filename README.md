@@ -4,7 +4,7 @@
 
 <p align="center">Limpeza de disco, análise de armazenamento e proteção de privacidade para <b>macOS</b>, <b>Windows</b> e <b>Linux</b></p>
 
-<p align="center"><a href="https://pixgg.com/"><img src="public/pixgg.png" width="20" alt="PixGG" /> <b>Pix:</b> pixgg</a></p>
+<p align="center"><a href="https://pixgg.com/"><img src="public/pixgg.svg" width="26" alt="PixGG" /> <b>Pix:</b> pixgg</a></p>
 
 ## Índice
 
